@@ -55,9 +55,9 @@ import io.narayana.util.DBUtils;
 public class DriverDirectRecoverable {
 
     public void process(Runnable middleAction) throws Exception {
-           DriverManager.registerDriver(DBUtils.TXN_DRIVER_INSTANCE);
+        DriverManager.registerDriver(DBUtils.TXN_DRIVER_INSTANCE);
 
-           //jdbc:arjuna: <path to properties file>
+        //jdbc:arjuna: <path to properties file>
         String jdbcUrl1 = TransactionalDriver.arjunaDriver + "target/classes/ds1.properties";
         Properties props1 = new Properties();
         props1.put(TransactionalDriver.dynamicClass, PropertyFileDynamicClass.class.getName());

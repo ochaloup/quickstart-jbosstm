@@ -24,6 +24,10 @@ package io.narayana;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
+import java.util.Arrays;
+import java.util.Properties;
+
+import javax.naming.Context;
 
 import org.jboss.byteman.contrib.bmunit.BMRule;
 import org.jboss.byteman.contrib.bmunit.BMUnitRunner;
@@ -33,7 +37,12 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+import com.arjuna.ats.arjuna.recovery.RecoveryManager;
+import com.arjuna.ats.jdbc.common.jdbcPropertyManager;
+import com.arjuna.ats.jta.common.jtaPropertyManager;
+
 import io.narayana.util.DBUtils;
+import io.narayana.util.TestInitialContextFactory;
 
 /**
  * Tests running commit and rollback scenarios for showcases
@@ -54,6 +63,9 @@ public class TransactionalDriverTest {
 
     @After
     public void tearDown() {
+        // cleaning recovery settings
+        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(null);
+        // cleaning database
         DBUtils.dropTable(conn1);
         DBUtils.dropTable(conn2);
     }
@@ -180,11 +192,10 @@ public class TransactionalDriverTest {
 
     @BMRule(
         name = "Fail on first commit call to XAResource",
-        // targetClass = "^javax.transaction.xa.XAResource",
-        // isInterface = true,
-        targetClass = "org.h2.jdbcx.JdbcXAConnection",
+        targetClass = "^javax.transaction.xa.XAResource",
+        isInterface = true,
         targetMethod = "commit",
-        targetLocation = "AT INVOKE",
+        targetLocation = "AT ENTRY",
         condition = "NOT flagged(\"is_failed\")",
         action = "System.out.println(\"Failing by Byteman rule\");" +
                  "flag(\"is_failed\");" +
@@ -194,15 +205,50 @@ public class TransactionalDriverTest {
     public void transactionDriverDirectRecoverableRecovery() throws Exception {
         // starting recovery manager
         // settings - recovery modules, filters, timeouts etc. is taken from jbossts-properties.xml descriptor
-        //RecoveryManager.manager();
+        RecoveryManager.manager();
+        
 
         new DriverDirectRecoverable().process(() -> {});
 
         // recovery to be run (timeouts needs to match to work here)
-        Thread.sleep(12 * 1000);
+        Thread.sleep(25 * 1000);
 
-        //RecoveryManager.manager().terminate();
+        RecoveryManager.manager().terminate();
 
+        ResultSet rs1 = DBUtils.select(conn1);
+        Assert.assertTrue("First database does not contain data as expected to be commited", rs1.next());
+    }
+    
+    @BMRule(
+            name = "Fail on first commit call to XAResource",
+            targetClass = "^javax.transaction.xa.XAResource",
+            isInterface = true,
+            targetMethod = "commit",
+            targetLocation = "AT ENTRY",
+            condition = "NOT flagged(\"is_failed\")",
+            action = "System.out.println(\"Failing by Byteman rule\");" +
+                     "flag(\"is_failed\");" +
+                     "throw new XAException(XAException.XAER_RMFAIL);"
+            )
+    @Test
+    public void transactionDriverIndirectRecoverableRecovery() throws Exception {
+        // starting recovery manager
+        // settings - recovery modules, filters, timeouts etc. is taken from jbossts-properties.xml descriptor
+        jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(Arrays.asList(
+            "com.arjuna.ats.internal.jdbc.recovery.JDBCXARecovery;target/classes/recovery-jdbcxa-test1.xml"
+        ));
+        Properties initProps = new Properties();
+        initProps.setProperty(Context.INITIAL_CONTEXT_FACTORY, TestInitialContextFactory.class.getName());
+        jdbcPropertyManager.getJDBCEnvironmentBean().setJndiProperties(initProps);
+        RecoveryManager.manager();
+        
+        new DriverIndirectRecoverable().process(() -> {});
+        
+        // recovery to be run (timeouts needs to match to work here)
+        Thread.sleep(40 * 1000);
+        
+        RecoveryManager.manager().terminate();
+        
         ResultSet rs1 = DBUtils.select(conn1);
         Assert.assertTrue("First database does not contain data as expected to be commited", rs1.next());
     }

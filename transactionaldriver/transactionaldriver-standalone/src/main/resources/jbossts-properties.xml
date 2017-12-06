@@ -79,6 +79,12 @@
         com.arjuna.ats.internal.arjuna.recovery.ExpiredTransactionStatusManagerScanner
     </entry>
 
+    <!-- Registering XAResourceRecovery to get registered handler capable to recover jdbc XAResources -->
+        <!--com.arjuna.ats.internal.jdbc.recovery.JDBCXARecovery;target/classes/recovery-jdbcxa-test2.xml-->
+    <!--<entry key="com.arjuna.ats.jta.recovery.XAResourceRecovery">
+        com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery;target/classes/recovery-basicxa-test1.xml;1
+    </entry> -->
+
     <!--
         Add the following to the set of expiryScannerClassNames above to move logs that cannot be completed by failure recovery.
             But be sure you know what you are doing and why!
@@ -93,7 +99,7 @@
     -->
     <entry key="RecoveryEnvironmentBean.recoveryListener">NO</entry>
 
-    <entry key="RecoveryEnvironmentBean.periodicRecoveryPeriod">7</entry>
+    <entry key="RecoveryEnvironmentBean.periodicRecoveryPeriod">5</entry>
     <entry key="RecoveryEnvironmentBean.recoveryBackoffPeriod">3</entry>
 
 </properties>
