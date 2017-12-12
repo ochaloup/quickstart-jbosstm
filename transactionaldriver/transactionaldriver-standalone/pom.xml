@@ -45,6 +45,11 @@
             <version>${version.h2}</version>
         </dependency>
         <dependency>
+    <groupId>org.postgresql</groupId>
+    <artifactId>postgresql</artifactId>
+    <version>42.1.4.jre7</version>
+</dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.junit}</version>

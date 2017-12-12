@@ -26,11 +26,14 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.Properties;
+
 import javax.naming.Context;
 import javax.naming.InitialContext;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
+
 import com.arjuna.ats.jdbc.TransactionalDriver;
+
 import io.narayana.util.DBUtils;
 import io.narayana.util.TestInitialContextFactory;
 
@@ -89,6 +92,9 @@ public class DriverIndirectRecoverable {
         } catch (Exception e) {
             tm.rollback();
             throw e;
+        } finally {
+            conn1.close();
+            conn2.close();
         }
     }
 

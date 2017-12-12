@@ -89,6 +89,9 @@ public class DriverDirectRecoverable {
         } catch (Exception e) {
             tm.rollback();
             throw e;
+        } finally {
+            conn1.close();
+            conn2.close();
         }
     }
 

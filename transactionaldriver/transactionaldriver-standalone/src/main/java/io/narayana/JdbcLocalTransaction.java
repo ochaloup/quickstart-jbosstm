@@ -24,7 +24,9 @@ package io.narayana;
 
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+
 import javax.sql.XADataSource;
+
 import io.narayana.util.DBUtils;
 
 /**

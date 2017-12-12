@@ -28,6 +28,7 @@ import javax.sql.XAConnection;
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
 import javax.transaction.xa.XAResource;
+
 import io.narayana.util.DBUtils;
 
 /**
@@ -69,6 +70,9 @@ public class ManagedTransaction {
         } catch (Exception e) {
             tm.rollback();
             throw e;
+        } finally {
+            xaConn1.close();
+            xaConn2.close();
         }
     }
 

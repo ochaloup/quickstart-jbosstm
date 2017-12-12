@@ -26,9 +26,12 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.util.Properties;
+
 import javax.sql.XADataSource;
 import javax.transaction.TransactionManager;
+
 import com.arjuna.ats.jdbc.TransactionalDriver;
+
 import io.narayana.util.DBUtils;
 
 /**
@@ -94,6 +97,9 @@ public class DriverProvidedXADataSource {
         } catch (Exception e) {
             tm.rollback();
             throw e;
+        } finally {
+            conn1.close();
+            conn2.close();
         }
     }
 

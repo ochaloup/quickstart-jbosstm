@@ -41,6 +41,7 @@ import com.arjuna.ats.arjuna.recovery.RecoveryManager;
 import com.arjuna.ats.jdbc.common.jdbcPropertyManager;
 import com.arjuna.ats.jta.common.jtaPropertyManager;
 
+import io.narayana.util.CodeUtils;
 import io.narayana.util.DBUtils;
 import io.narayana.util.TestInitialContextFactory;
 
@@ -62,12 +63,15 @@ public class TransactionalDriverTest {
     }
 
     @After
-    public void tearDown() {
+    public void tearDown() throws Exception {
         // cleaning recovery settings
         jtaPropertyManager.getJTAEnvironmentBean().setXaResourceRecoveryClassNames(null);
         // cleaning database
+        Thread.sleep(10); // waiting for tables veing unlocked
         DBUtils.dropTable(conn1);
         DBUtils.dropTable(conn2);
+        // closing connections
+        CodeUtils.closeMultiple(conn1, conn2);
     }
 
     @Test
@@ -205,31 +209,28 @@ public class TransactionalDriverTest {
     public void transactionDriverDirectRecoverableRecovery() throws Exception {
         // starting recovery manager
         // settings - recovery modules, filters, timeouts etc. is taken from jbossts-properties.xml descriptor
-        RecoveryManager.manager();
-        
+        RecoveryManager manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
+        manager.initialize();
 
         new DriverDirectRecoverable().process(() -> {});
 
-        // recovery to be run (timeouts needs to match to work here)
-        Thread.sleep(25 * 1000);
-
-        RecoveryManager.manager().terminate();
+        manager.scan();
 
         ResultSet rs1 = DBUtils.select(conn1);
         Assert.assertTrue("First database does not contain data as expected to be commited", rs1.next());
     }
     
     @BMRule(
-            name = "Fail on first commit call to XAResource",
-            targetClass = "^javax.transaction.xa.XAResource",
-            isInterface = true,
-            targetMethod = "commit",
-            targetLocation = "AT ENTRY",
-            condition = "NOT flagged(\"is_failed\")",
-            action = "System.out.println(\"Failing by Byteman rule\");" +
-                     "flag(\"is_failed\");" +
-                     "throw new XAException(XAException.XAER_RMFAIL);"
-            )
+        name = "Fail on first commit call to XAResource",
+        targetClass = "^javax.transaction.xa.XAResource",
+        isInterface = true,
+        targetMethod = "commit",
+        targetLocation = "AT ENTRY",
+        condition = "NOT flagged(\"is_failed\")",
+        action = "System.out.println(\"Failing by Byteman rule\");" +
+                 "flag(\"is_failed\");" +
+                 "throw new XAException(XAException.XAER_RMFAIL);"
+    )
     @Test
     public void transactionDriverIndirectRecoverableRecovery() throws Exception {
         // starting recovery manager
@@ -240,15 +241,14 @@ public class TransactionalDriverTest {
         Properties initProps = new Properties();
         initProps.setProperty(Context.INITIAL_CONTEXT_FACTORY, TestInitialContextFactory.class.getName());
         jdbcPropertyManager.getJDBCEnvironmentBean().setJndiProperties(initProps);
-        RecoveryManager.manager();
-        
+        RecoveryManager manager = RecoveryManager.manager(RecoveryManager.DIRECT_MANAGEMENT);
+        manager.initialize();
+
         new DriverIndirectRecoverable().process(() -> {});
-        
-        // recovery to be run (timeouts needs to match to work here)
-        Thread.sleep(40 * 1000);
-        
-        RecoveryManager.manager().terminate();
-        
+
+        manager.scan();
+        manager.terminate(false);
+
         ResultSet rs1 = DBUtils.select(conn1);
         Assert.assertTrue("First database does not contain data as expected to be commited", rs1.next());
     }
