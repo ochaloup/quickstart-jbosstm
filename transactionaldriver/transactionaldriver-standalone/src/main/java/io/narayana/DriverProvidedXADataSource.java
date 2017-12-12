@@ -69,8 +69,8 @@ public class DriverProvidedXADataSource {
         XADataSource dsXA1 = DBUtils.getXADatasource(DBUtils.DB_1);
         Properties props1 = new Properties();
         props1.put(TransactionalDriver.XADataSource, dsXA1);
-        props1.put(TransactionalDriver.userName, "");
-        props1.put(TransactionalDriver.password, "");
+        props1.put(TransactionalDriver.userName, "crashrec");
+        props1.put(TransactionalDriver.password, "crashrec");
         Connection conn1 = DriverManager.getConnection(transactionDriverDefinitionUrl, props1);
 
         XADataSource dsXA2 = DBUtils.getXADatasource(DBUtils.DB_2);

@@ -27,7 +27,7 @@ import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import javax.sql.XADataSource;
-import org.h2.jdbcx.JdbcDataSource;
+import org.postgresql.xa.PGXADataSource;
 
 import com.arjuna.ats.jdbc.TransactionalDriver;
 
@@ -38,13 +38,11 @@ import com.arjuna.ats.jdbc.TransactionalDriver;
 public class DBUtils {
     public static final java.sql.Driver TXN_DRIVER_INSTANCE = new TransactionalDriver();
 
-    public static final String DB_1 = "test1";
-    public static final String DB_2 = "test2";
+    public static final String DB_1 = "crashrec";
+    public static final String DB_2 = "crashrec2";
 
-    private static final String DB_DRIVER = "org.h2.Driver";
-    private static final String DB_CONNECTION = "jdbc:h2:mem:%s;DB_CLOSE_DELAY=-1";
-    private static final String DB_USER = "";
-    private static final String DB_PASSWORD = "";
+    private static final String DB_DRIVER = "org.postgresql.Driver";
+    private static final String DB_CONNECTION = "jdbc:postgresql://localhost:5432/%s";
 
     private static String TEST_TABLE_NAME = "TXN_DRIVER_TEST";
     public static String CREATE_TABLE = String.format("CREATE TABLE %s(id int primary key, value varchar(42))", TEST_TABLE_NAME);
@@ -61,18 +59,21 @@ public class DBUtils {
         }
         try {
             String dbConnectionUrl = String.format(DB_CONNECTION, dbname);
-            dbConnection = DriverManager.getConnection(dbConnectionUrl, DB_USER, DB_PASSWORD);
+            dbConnection = DriverManager.getConnection(dbConnectionUrl, dbname, dbname);
             return dbConnection;
         } catch (SQLException e) {
-            throw new IllegalStateException("Can't get connection to inmem H2 database " + dbname, e);
+            throw new IllegalStateException("Can't get connection to database '"
+                + dbname + "' of connection '" + DB_CONNECTION + "'", e);
         }
     }
 
     public static XADataSource getXADatasource(String dbName) {
-        JdbcDataSource ds = new JdbcDataSource();
-        ds.setURL(String.format(DB_CONNECTION, dbName));
-        ds.setUser(DB_USER);
-        ds.setPassword(DB_PASSWORD);
+        PGXADataSource ds = new PGXADataSource();
+        ds.setServerName("localhost");
+        ds.setPortNumber(5432);
+        ds.setDatabaseName(dbName);
+        ds.setUser(dbName);
+        ds.setPassword(dbName);
         return ds;
     }
 

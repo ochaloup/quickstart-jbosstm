@@ -64,8 +64,8 @@ public class DriverIndirectRecoverable {
         XADataSource dsXA1 = DBUtils.getXADatasource(DBUtils.DB_1);
         ctx.bind("ds1", dsXA1);
         Properties props1 = new Properties();
-        props1.put(TransactionalDriver.userName, "");
-        props1.put(TransactionalDriver.password, "");
+        props1.put(TransactionalDriver.userName, "crashrec");
+        props1.put(TransactionalDriver.password, "crashrec");
         Connection conn1 = DriverManager.getConnection(ds1Jndi, props1);
 
         String ds2Jndi = TransactionalDriver.arjunaDriver + "ds2";

@@ -61,8 +61,8 @@ public class DriverDirectRecoverable {
         String jdbcUrl1 = TransactionalDriver.arjunaDriver + "target/classes/ds1.properties";
         Properties props1 = new Properties();
         props1.put(TransactionalDriver.dynamicClass, PropertyFileDynamicClass.class.getName());
-        props1.put(TransactionalDriver.userName, "");
-        props1.put(TransactionalDriver.password, "");
+        props1.put(TransactionalDriver.userName, "crashrec");
+        props1.put(TransactionalDriver.password, "crashrec");
         Connection conn1 = DriverManager.getConnection(jdbcUrl1, props1);
 
         String jdbcUrl2 = TransactionalDriver.arjunaDriver + "target/classes/ds2.properties";

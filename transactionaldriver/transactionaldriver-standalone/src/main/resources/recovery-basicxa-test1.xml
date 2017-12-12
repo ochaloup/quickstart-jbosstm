@@ -1,7 +1,9 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <properties>
-    <entry key="DB_1_DatabaseUser"></entry>
-    <entry key="DB_1_DatabasePassword"></entry>
     <entry key="DB_1_DatabaseDynamicClass"></entry>
-    <entry key="DB_1_DatabaseURL">jdbc:h2:mem:test1;DB_CLOSE_DELAY=-1</entry>
+    <entry key="DB_1_DatabaseServerName">localhost</entry>
+    <entry key="DB_1_DatabasePortNumber">5432</entry>
+    <entry key="DB_1_DatabaseDatabaseName">crashrec</entry>
+    <entry key="DB_1_DatabaseUser">crashrec</entry>
+    <entry key="DB_1_DatabasePassword">crashrec</entry>
 </properties>
