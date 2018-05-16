@@ -8,7 +8,7 @@ You must add a $TOMCAT_HOME/bin/setenv.sh with the following content:
 `export JAVA_OPTS="-Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$QUICKSTART_HOME/src/main/resources/h2recoveryproperties.xml\ \;1"`
 
 Start Tomcat in the usual manner, for example:
-`$TOMCAT_HOME/bin/catalina.sh  run`
+`$CATALINA_HOME/bin/catalina.sh  run`
 
 ### Build the app
 
@@ -16,7 +16,7 @@ Start Tomcat in the usual manner, for example:
 
 ### Deploy the app
 
-`cp target/*.war apache-tomcat-7.0.78/webapps/`
+`cp target/*.war apache-tomcat-9.0.7/webapps/`
 
 ### Get strings from the database
 
