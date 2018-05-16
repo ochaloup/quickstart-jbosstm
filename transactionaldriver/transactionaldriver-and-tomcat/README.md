@@ -4,9 +4,6 @@ This quickstart shows how to get started with Narayana and Transactional Driver 
 
 ### Start Tomcat
 
-You must add a $TOMCAT_HOME/bin/setenv.sh with the following content:
-`export JAVA_OPTS="-Dcom.arjuna.ats.jta.recovery.XAResourceRecovery1=com.arjuna.ats.internal.jdbc.recovery.BasicXARecovery\;abs://$QUICKSTART_HOME/src/main/resources/h2recoveryproperties.xml\ \;1"`
-
 Start Tomcat in the usual manner, for example:
 `$CATALINA_HOME/bin/catalina.sh  run`
 
