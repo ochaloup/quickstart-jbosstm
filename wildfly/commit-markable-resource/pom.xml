@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <!--
 ~ JBoss, Home of Professional Open Source.
-~ Copyright 2014, Red Hat, Inc., and individual contributors
+~ Copyright 2018, Red Hat, Inc., and individual contributors
 ~ as indicated by the @author tags. See the copyright.txt file in the
 ~ distribution for a full listing of individual contributors.
 ~
@@ -27,97 +27,87 @@
     <groupId>org.jboss.narayana.quickstarts</groupId>
     <artifactId>commit-markable-resource</artifactId>
     <version>5.8.3.Final-SNAPSHOT</version>
+    <packaging>war</packaging>
 
     <name>Narayana Quickstarts: Commit Markable Resource in Wildfly</name>
     <description>Example demonstrates the use of the Narayana 1PC optimization for full XA handling of non-XA JDBC resource</description>
-
     <url>http://narayana.io</url>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.target>1.8</maven.compiler.target>
         <maven.compiler.source>1.8</maven.compiler.source>
+        <failOnMissingWebXml>false</failOnMissingWebXml>
 
+        <jvm.args>-server -Xms64m -Xmx1024m -XX:MaxPermSize=512m</jvm.args>
+        <jvm.args.debug></jvm.args.debug>
         <ipv6.server.jvm.args>-Djboss.bind.address=[::1] -Djboss.bind.address.management=[::1] -Djboss.bind.address.unsecure=[::1] -Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</ipv6.server.jvm.args>
 
-        <version.org.jboss.spec.javax.transaction>1.0.1.Final</version.org.jboss.spec.javax.transaction>
-        <version.org.jboss.spec.javax.ejb>1.0.0.Final</version.org.jboss.spec.javax.ejb>
-        <version.org.jboss.spec.javax.jms>1.0.0.Final</version.org.jboss.spec.javax.jms>
-        <version.hibernate.javax.persistence>1.0.0.Final</version.hibernate.javax.persistence>
-        <version.javax.enterprise>1.1</version.javax.enterprise>
         <version.junit>4.12</version.junit>
+        <version.javaee.spec>1.1.1.Final</version.javaee.spec>
+
         <version.org.wildfly.arquillian>1.0.1.Final</version.org.wildfly.arquillian>
         <version.org.jboss.arquillian>1.1.8.Final</version.org.jboss.arquillian>
-        <ipv6.server.jvm.args>-Djboss.bind.address=[::1] -Djboss.bind.address.management=[::1] -Djboss.bind.address.unsecure=[::1] -Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</ipv6.server.jvm.args>
-        <jvm.args.memory>-Xms64m -Xmx1024m -XX:MaxPermSize=512m</jvm.args.memory>
-        <jvm.args.debug></jvm.args.debug>
-        <jvm.args.other>-server</jvm.args.other>
         <version.surefire.plugin>2.19.1</version.surefire.plugin>
     </properties>
 
-    <repositories>
-        <repository>
-            <id>jboss-public-repository-group</id>
-            <name>JBoss Public Maven Repository Group</name>
-            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-            <releases>
-                <enabled>true</enabled>
-            </releases>
-            <snapshots>
-                <enabled>true</enabled>
-            </snapshots>
-        </repository>
-    </repositories>
+    <dependencyManagement>
+        <dependencies>
+            <dependency>
+                <groupId>org.jboss.spec</groupId>
+                <artifactId>jboss-javaee-7.0</artifactId>
+                <version>${version.javaee.spec}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
 
     <dependencies>
         <dependency>
-            <groupId>org.jboss.spec.javax.transaction</groupId>
-            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
-            <version>${version.org.jboss.spec.javax.transaction}</version>
+            <groupId>org.jboss.spec.javax.servlet</groupId>
+            <artifactId>jboss-servlet-api_3.1_spec</artifactId>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.spec.javax.ejb</groupId>
             <artifactId>jboss-ejb-api_3.2_spec</artifactId>
-            <version>${version.org.jboss.spec.javax.ejb}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.spec.javax.jms</groupId>
             <artifactId>jboss-jms-api_2.0_spec</artifactId>
-            <version>${version.org.jboss.spec.javax.jms}</version>
+            <scope>provided</scope>
         </dependency>
-
+        <dependency>
+            <groupId>org.jboss.spec.javax.transaction</groupId>
+            <artifactId>jboss-transaction-api_1.2_spec</artifactId>
+            <scope>provided</scope>
+        </dependency>
         <dependency>
             <groupId>org.hibernate.javax.persistence</groupId>
             <artifactId>hibernate-jpa-2.1-api</artifactId>
-            <version>${version.hibernate.javax.persistence}</version>
             <scope>provided</scope>
         </dependency>
-
         <dependency>
             <groupId>javax.enterprise</groupId>
             <artifactId>cdi-api</artifactId>
-            <version>${version.javax.enterprise}</version>
             <scope>provided</scope>
         </dependency>
-
+        
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${version.junit}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
             <version>${version.org.jboss.arquillian}</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
             <groupId>org.jboss.arquillian.protocol</groupId>
             <artifactId>arquillian-protocol-servlet</artifactId>
@@ -125,6 +115,24 @@
             <scope>test</scope>
         </dependency>
     </dependencies>
+
+    <build>
+        <finalName>servlet-cmr</finalName>
+
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-war-plugin</artifactId>
+                <configuration>
+                    <webResources>
+                        <resource>
+                            <directory>${project.basedir}/src/main/webapp</directory>
+                        </resource>
+                    </webResources>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 
     <profiles>
         <profile>
@@ -148,10 +156,7 @@
                         <configuration>
                             <skip>false</skip>
                             <systemPropertyVariables combine.children="append">
-                                <!--
-                                    Used in arquillian.xml
-                                -->
-                                <server.jvm.args>${jvm.args.other} ${jvm.args.memory} ${jvm.args.debug}</server.jvm.args>
+                                <server.jvm.args>${jvm.args} ${jvm.args.debug}</server.jvm.args>
                                 <node.address>127.0.0.1</node.address>
                             </systemPropertyVariables>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -182,10 +187,7 @@
                             <skip>false</skip>
                             <argLine>${ipv6.server.jvm.args}</argLine>
                             <systemPropertyVariables combine.children="append">
-                                <!--
-                                    Used in arquillian.xml
-                                -->
-                                <server.jvm.args>${jvm.args.other} ${jvm.args.memory} ${ipv6.server.jvm.args} ${jvm.args.debug}</server.jvm.args>
+                                <server.jvm.args>${jvm.args} ${ipv6.server.jvm.args} ${jvm.args.debug}</server.jvm.args>
                                 <node.address>[::1]</node.address>
                             </systemPropertyVariables>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
@@ -195,5 +197,20 @@
             </build>
         </profile>
     </profiles>
+
+
+    <repositories>
+        <repository>
+            <id>jboss-public-repository-group</id>
+            <name>JBoss Public Maven Repository Group</name>
+            <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+            <releases>
+                <enabled>true</enabled>
+            </releases>
+            <snapshots>
+                <enabled>true</enabled>
+            </snapshots>
+        </repository>
+    </repositories>
 
 </project>

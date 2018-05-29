@@ -1,0 +1,21 @@
+= Commit markable resource
+Author: Ondra Chaloupka
+Level: Intermediate
+Technologies: JTA, JPA, JMS
+
+== What is it?
+
+This examples demostrates how to setup and use Commit Markable Resource (CMR)
+as 1PC optimization in WildFly application server. 
+
+== Build and Deploy
+
+TODO: !
+
+In order to run quickstart in the managed Wildfly application server, run the following command:
+
+        mvn clean install
+
+In order to run quickstart in the remote Wildfly application server, run the following command:
+
+        mvn clean install -Parq

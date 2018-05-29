@@ -23,6 +23,7 @@ wildfly-10.*/
 wildfly-10.*.jar
 apache-tomcat-*
 narayana-full-*-bin.zip
-jboss*/
+jboss1/
+jboss2/
 bin/
 db/
