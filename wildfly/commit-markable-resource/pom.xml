@@ -39,16 +39,17 @@
         <maven.compiler.source>1.8</maven.compiler.source>
         <failOnMissingWebXml>false</failOnMissingWebXml>
 
-        <jvm.args>-server -Xms64m -Xmx1024m -XX:MaxPermSize=512m</jvm.args>
+        <server.args>-Dprojectdir=${project.build.directory}</server.args>
+        <jvm.args>-server -Xms64m -Xmx1024m -XX:MaxPermSize=512m ${server.args}</jvm.args>
         <jvm.args.debug></jvm.args.debug>
         <ipv6.server.jvm.args>-Djboss.bind.address=[::1] -Djboss.bind.address.management=[::1] -Djboss.bind.address.unsecure=[::1] -Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</ipv6.server.jvm.args>
-
-        <version.junit>4.12</version.junit>
+        
         <version.javaee.spec>1.1.1.Final</version.javaee.spec>
         <version.wildfly.logging>5.0.0.Beta5</version.wildfly.logging>
 
-        <version.org.wildfly.arquillian>1.0.1.Final</version.org.wildfly.arquillian>
-        <version.org.jboss.arquillian>1.1.8.Final</version.org.jboss.arquillian>
+        <version.junit>4.12</version.junit>
+        <version.org.wildfly.arquillian>2.1.0.Final</version.org.wildfly.arquillian>
+        <version.arquillian.junit>1.4.0.Final</version.arquillian.junit>
         <version.surefire.plugin>2.19.1</version.surefire.plugin>
     </properties>
 
@@ -116,13 +117,19 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
-            <version>${version.org.jboss.arquillian}</version>
+            <version>${version.arquillian.junit}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.protocol</groupId>
             <artifactId>arquillian-protocol-servlet</artifactId>
-            <version>${version.org.jboss.arquillian}</version>
+            <version>${version.arquillian.junit}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.core</groupId>
+            <artifactId>arquillian-core-api</artifactId>
+            <version>${version.arquillian.junit}</version>
             <scope>test</scope>
         </dependency>
     </dependencies>
@@ -196,7 +203,6 @@
           </properties>
         </profile>
     </profiles>
-
 
     <repositories>
         <repository>

@@ -14,7 +14,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package org.jboss.narayana.quickstarts.jta;
+package org.jboss.narayana.quickstarts.cmr;
 
 import javax.inject.Inject;
 import javax.naming.InitialContext;
@@ -51,12 +51,14 @@ public class TestCase {
 
     @Deployment
     public static WebArchive createTestArchive() {
-        return ShrinkWrap.create(WebArchive.class, "test.war")
-                .addPackages(true, BookEntity.class.getPackage().getName())
-                .addAsResource("META-INF/test-persistence.xml", "META-INF/persistence.xml")
-                .addAsWebInfResource("test-ds.xml", "test-ds.xml")
-                .addAsWebInfResource("test-jms.xml", "test-jms.xml")
-                .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        WebArchive wa = ShrinkWrap.create(WebArchive.class, "cmr.war")
+            .addPackages(true, BookEntity.class.getPackage().getName())
+            .addAsResource("META-INF/test-persistence.xml", "META-INF/persistence.xml")
+            .addAsWebInfResource("webapp/WEB-INF/jdbc-ds.xml", "jdbc-ds.xml")
+            .addAsWebInfResource("webapp/WEB-INF/test-jms.xml", "test-jms.xml")
+            .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
+        System.out.printf(">>>>>>> webarchive content:%n%s%n", wa.toString(true));
+        return wa;
     }
 
     @Before
