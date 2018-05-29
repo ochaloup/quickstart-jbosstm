@@ -27,12 +27,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-@WebServlet(name="BookServlet", urlPatterns={"/"})
+@WebServlet(name="BookServlet", urlPatterns={"/servlet"})
 public class BookServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Inject
-    private BookDAO bookDao;
+    private BookProcessor bookDao;
         
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -49,13 +49,13 @@ public class BookServlet extends HttpServlet {
                 if(title == null) {
                     out.println("Parameter 'title' was not set. No book added.");
                 }
-                bookDao.save(new BookEntity().setTitle(title));
+                bookDao.fileBook(title);
                 out.printf("<b>Book title %s was saved.%n", title);
                 break;
             case "get":
             default:
                 out.println("<table><th><td>Id</td><td>Title</td></th>");
-                for(BookEntity book: bookDao.findAll()) {
+                for(BookEntity book: bookDao.getBooks()) {
                     out.printf("<tr><td>%s</td><td>%s</td></tr>%n", book.getId(), book.getTitle());
                 }
                 out.print("</table>");

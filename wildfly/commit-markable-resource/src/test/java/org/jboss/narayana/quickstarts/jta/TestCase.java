@@ -24,7 +24,7 @@ import javax.transaction.TransactionalException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.narayana.quickstarts.cmr.BookDAO;
+import org.jboss.narayana.quickstarts.cmr.BookProcessor;
 import org.jboss.narayana.quickstarts.cmr.BookEntity;
 import org.jboss.narayana.quickstarts.cmr.MessageHandler;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -36,6 +36,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
+// TODO: https://stackoverflow.com/questions/29183503/start-h2-database-programmatically/29184321
 @RunWith(Arquillian.class)
 public class TestCase {
 
@@ -43,7 +44,7 @@ public class TestCase {
     private MessageHandler quickstartQueue;
 
     @Inject
-    private BookDAO quickstartEntityRepository;
+    private BookProcessor quickstartEntityRepository;
 
 
     private TransactionManager transactionManager;
@@ -73,33 +74,33 @@ public class TestCase {
 
     @Test
     public void testCommit() throws Exception {
-        final int entitiesCountBefore = quickstartEntityRepository.findAll().size();
+        final int entitiesCountBefore = quickstartEntityRepository.getBooks().size();
 
         transactionManager.begin();
-        quickstartEntityRepository.save(new BookEntity().setTitle("test"));
+        quickstartEntityRepository.fileBook("test");
         quickstartQueue.send("testCommit");
         transactionManager.commit();
 
-        Assert.assertEquals(entitiesCountBefore + 1, quickstartEntityRepository.findAll().size());
+        Assert.assertEquals(entitiesCountBefore + 1, quickstartEntityRepository.getBooks().size());
         Assert.assertEquals("testCommit", quickstartQueue.get());
     }
 
     @Test
     public void testRollback() throws Exception {
-        final int entitiesCountBefore = quickstartEntityRepository.findAll().size();
+        final int entitiesCountBefore = quickstartEntityRepository.getBooks().size();
 
         transactionManager.begin();
-        quickstartEntityRepository.save(new BookEntity().setTitle("test"));
+        quickstartEntityRepository.fileBook("test");
         quickstartQueue.send("testRollback");
         transactionManager.rollback();
 
-        Assert.assertEquals(entitiesCountBefore, quickstartEntityRepository.findAll().size());
+        Assert.assertEquals(entitiesCountBefore, quickstartEntityRepository.getBooks().size());
         Assert.assertEquals("", quickstartQueue.get());
     }
 
     @Test(expected = TransactionalException.class)
     public void testWithoutTransaction() {
-        quickstartEntityRepository.save(new BookEntity().setTitle("test"));
+        quickstartEntityRepository.fileBook("test");
     }
 
 }

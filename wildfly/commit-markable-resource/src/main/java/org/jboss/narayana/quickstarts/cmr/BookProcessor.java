@@ -17,35 +17,59 @@
 
 package org.jboss.narayana.quickstarts.cmr;
 
+import java.util.List;
+
+import javax.enterprise.context.Dependent;
+import javax.inject.Inject;
+import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.transaction.Transactional;
-import java.util.List;
+
+import org.jboss.logging.Logger;
 
 /**
- * Data access object to {@link BookEntity}.
+ * Maintaining books in the system.
  */
-public class BookDAO {
+@Dependent
+@Named
+public class BookProcessor {
+    private static final Logger log = Logger.getLogger(BookProcessor.class);
 
     @PersistenceContext(unitName = "jdbc-datasource")
     private EntityManager entityManager;
 
+    @Inject
+    private MessageHandler messageHandler;
+
     @SuppressWarnings("unchecked")
     @Transactional
-    public List<BookEntity> findAll() {
+    public List<BookEntity> getBooks() {
         final Query query = entityManager.createQuery("select book from " + BookEntity.class.getSimpleName() + " book");
         return (List<BookEntity>) query.getResultList();
     }
 
+    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    public Integer fileBook(String title) {
+        if(title == null) throw new NullPointerException("title");
+
+        BookEntity book = new BookEntity().setTitle(title);
+        Integer id = this.save(book);
+
+        messageHandler.send(id + ", " + title);
+
+        log.infof("New book was filed as id: %s, title: %s", id, title);
+        return id;
+    }
+
     @Transactional(Transactional.TxType.MANDATORY)
-    public Integer save(BookEntity book) {
+    private Integer save(BookEntity book) {
         if (book.isTransient()) {
             entityManager.persist(book);
         } else {
             entityManager.merge(book);
         }
-
         return book.getId();
     }
 }

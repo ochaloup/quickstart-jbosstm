@@ -18,9 +18,7 @@
 package org.jboss.narayana.quickstarts.cmr;
 
 import javax.annotation.Resource;
-import javax.ejb.Stateless;
-import javax.ejb.TransactionAttribute;
-import javax.ejb.TransactionAttributeType;
+import javax.enterprise.context.Dependent;
 import javax.jms.ConnectionFactory;
 import javax.jms.JMSContext;
 import javax.jms.JMSException;
@@ -33,7 +31,7 @@ import javax.transaction.Transactional;
  * Helper class used for sending and receiving messages
  * to the attached jms queue. Running it as XA participant.
  */
-@Stateless
+@Dependent
 public class MessageHandler {
 
     @Resource(lookup = "java:/JmsXA")
@@ -42,7 +40,6 @@ public class MessageHandler {
     @Resource(lookup = "java:/queue/cmr")
     private Queue queue;
 
-    @TransactionAttribute(TransactionAttributeType.MANDATORY)
     @Transactional(Transactional.TxType.MANDATORY)
     public void send(final String message) {
         try (JMSContext context = connectionFactory.createContext()) {
@@ -50,7 +47,7 @@ public class MessageHandler {
         }
     }
 
-    @TransactionAttribute(TransactionAttributeType.REQUIRED)
+    @Transactional(Transactional.TxType.REQUIRED)
     public String get() throws JMSException {
         try (JMSContext context = connectionFactory.createContext()) {
             Message msg = context.createConsumer(queue).receive();
