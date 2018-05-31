@@ -38,7 +38,7 @@ import org.junit.runner.RunWith;
 
 // TODO: https://stackoverflow.com/questions/29183503/start-h2-database-programmatically/29184321
 @RunWith(Arquillian.class)
-public class TestCase {
+public class CmrLrcoTestCase {
 
     @Inject
     private MessageHandler quickstartQueue;
