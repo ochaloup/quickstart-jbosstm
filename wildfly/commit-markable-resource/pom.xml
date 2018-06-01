@@ -66,6 +66,13 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
+<!--
+            <dependency>
+                <groupId>org.jboss.shrinkwrap</groupId>
+                <artifactId>shrinkwrap-impl-base</artifactId>
+                <version>1.2.6.hacking</version>
+            </dependency>
+-->
         </dependencies>
     </dependencyManagement>
 
@@ -160,6 +167,7 @@
                                 <node.address>127.0.0.1</node.address>
                             </systemPropertyVariables>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
+                            <!--<workingDirectory>workdir</workingDirectory>-->
                         </configuration>
                     </plugin>
                 </plugins>

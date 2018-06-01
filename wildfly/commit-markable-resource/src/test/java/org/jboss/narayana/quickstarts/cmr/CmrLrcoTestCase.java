@@ -53,7 +53,7 @@ public class CmrLrcoTestCase {
     public static WebArchive createTestArchive() {
         WebArchive wa = ShrinkWrap.create(WebArchive.class, "cmr.war")
             .addPackages(true, BookEntity.class.getPackage().getName())
-            .addAsResource("META-INF/test-persistence.xml", "META-INF/persistence.xml")
+            .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
             .addAsWebInfResource("webapp/WEB-INF/jdbc-ds.xml", "jdbc-ds.xml")
             .addAsWebInfResource("webapp/WEB-INF/test-jms.xml", "test-jms.xml")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");

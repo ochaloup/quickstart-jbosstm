@@ -20,8 +20,7 @@
 ~ Software Foundation, Inc., 51 Franklin St, Fifth Floor, Boston, MA
 ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
-<datasources xmlns="http://www.jboss.org/ironjacamar/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-             xsi:schemaLocation="http://www.jboss.org/ironjacamar/schema http://docs.jboss.org/ironjacamar/schema/datasources_1_0.xsd">
+<datasources xmlns="http://www.jboss.org/ironjacamar/schema" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance">
 
     <!-- The datasource is bound into JNDI at this location, referenced at META-INF/persistence.xml -->
     <datasource jndi-name="java:jboss/datasources/jdbc" pool-name="jdbc-datasource"
