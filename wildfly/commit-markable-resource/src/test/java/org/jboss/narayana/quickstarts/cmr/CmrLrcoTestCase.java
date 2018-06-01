@@ -24,11 +24,12 @@ import javax.transaction.TransactionalException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
 import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.narayana.quickstarts.cmr.BookProcessor;
-import org.jboss.narayana.quickstarts.cmr.BookEntity;
-import org.jboss.narayana.quickstarts.cmr.MessageHandler;
+import org.jboss.narayana.quickstarts.cmr.arquillian.ArquillianExtension;
+import org.jboss.shrinkwrap.api.Filters;
+import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
 import org.jboss.shrinkwrap.api.asset.EmptyAsset;
+import org.jboss.shrinkwrap.api.importer.ExplodedImporter;
 import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
@@ -51,14 +52,17 @@ public class CmrLrcoTestCase {
 
     @Deployment
     public static WebArchive createTestArchive() {
-        WebArchive wa = ShrinkWrap.create(WebArchive.class, "cmr.war")
+        WebArchive war = ShrinkWrap.create(WebArchive.class, "cmr.war")
             .addPackages(true, BookEntity.class.getPackage().getName())
+            .deletePackage(ArquillianExtension.class.getPackage())
             .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
-            .addAsWebInfResource("webapp/WEB-INF/jdbc-ds.xml", "jdbc-ds.xml")
-            .addAsWebInfResource("webapp/WEB-INF/test-jms.xml", "test-jms.xml")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
-        System.out.printf(">>>>>>> webarchive content:%n%s%n", wa.toString(true));
-        return wa;
+        war.merge(ShrinkWrap.create(GenericArchive.class).as(ExplodedImporter.class)  
+            .importDirectory("src/main/webapp").as(GenericArchive.class),  
+            "/", Filters.includeAll());
+
+        System.out.printf(">>>>>>> webarchive content:%n%s%n", war.toString(true));
+        return war;
     }
 
     @Before
