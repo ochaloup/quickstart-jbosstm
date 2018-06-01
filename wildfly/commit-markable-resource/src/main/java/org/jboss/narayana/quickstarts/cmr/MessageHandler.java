@@ -17,6 +17,8 @@
 
 package org.jboss.narayana.quickstarts.cmr;
 
+import java.util.Optional;
+
 import javax.annotation.Resource;
 import javax.enterprise.context.Dependent;
 import javax.jms.ConnectionFactory;
@@ -48,10 +50,11 @@ public class MessageHandler {
     }
 
     @Transactional(Transactional.TxType.REQUIRED)
-    public String get() throws JMSException {
+    public Optional<String> get() throws JMSException {
         try (JMSContext context = connectionFactory.createContext()) {
-            Message msg = context.createConsumer(queue).receive();
-            if(msg instanceof TextMessage) return ((TextMessage)msg).getText();
+            Message msg = context.createConsumer(queue).receive(500);
+            if(msg == null) return Optional.empty();
+            if(msg instanceof TextMessage) return Optional.of(((TextMessage)msg).getText());
             throw new IllegalStateException("Expected message " + msg + " being type of text but it's "
                 + msg.getJMSType());
         }

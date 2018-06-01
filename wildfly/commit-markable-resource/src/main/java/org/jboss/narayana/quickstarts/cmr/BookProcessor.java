@@ -54,7 +54,7 @@ public class BookProcessor {
         return (List<BookEntity>) query.getResultList();
     }
 
-    @Transactional(Transactional.TxType.REQUIRES_NEW)
+    @Transactional(Transactional.TxType.REQUIRED)
     public Integer fileBook(String title) {
         if(title == null) throw new NullPointerException("title");
 

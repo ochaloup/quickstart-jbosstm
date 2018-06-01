@@ -53,7 +53,7 @@
         <version.arquillian>1.1.11.Final</version.arquillian>
         <version.arquillian.wildfly>2.1.0.Final</version.arquillian.wildfly>
         <version.arquillian.byteman>1.0.0.Alpha4</version.arquillian.byteman>
-        <version.byteman>4.0.2</version.byteman>
+        <version.byteman>3.0.8</version.byteman>
     </properties>
 
     <build>
@@ -234,6 +234,7 @@
         </profile>
         <profile>
           <id>debug</id>
+          <!-- when used need to activate 'arq' profile too: -Parq,debug -->
           <properties>
             <jvm.args.debug>-Xrunjdwp:transport=dt_socket,address=8787,server=y,suspend=y</jvm.args.debug>
           </properties>

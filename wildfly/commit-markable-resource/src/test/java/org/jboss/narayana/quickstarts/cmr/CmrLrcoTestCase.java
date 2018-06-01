@@ -16,6 +16,8 @@
  */
 package org.jboss.narayana.quickstarts.cmr;
 
+import java.util.Optional;
+
 import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
@@ -47,7 +49,6 @@ public class CmrLrcoTestCase {
     @Inject
     private BookProcessor bookRepository;
 
-
     private TransactionManager transactionManager;
 
     @Deployment
@@ -65,29 +66,45 @@ public class CmrLrcoTestCase {
         return war;
     }
 
+    @Before
+    public void before() throws NamingException {
+        transactionManager = (TransactionManager) new InitialContext().lookup("java:/jboss/TransactionManager");
+    }
+
+    @After
+    public void after() {
+        try {
+            transactionManager.rollback();
+        } catch (final Throwable t) {
+        }
+    }
+
     @Test
     public void testCommit() throws Exception {
         final int entitiesCountBefore = bookRepository.getBooks().size();
 
+        transactionManager.begin();
         int bookId = bookRepository.fileBook("test");
+        transactionManager.commit();
 
-        Assert.assertEquals(entitiesCountBefore + 1, bookRepository.getBooks().size());
-        Assert.assertEquals(BookProcessor.textOfMessage(bookId, "test"), messageHandler.get());
+        Assert.assertEquals("A new book should be filed",
+            entitiesCountBefore + 1, bookRepository.getBooks().size());
+        Assert.assertEquals("The transaction was committed thus the inform message is expected to be received",
+            BookProcessor.textOfMessage(bookId, "test"), messageHandler.get().get());
     }
 
     @Test
     public void testRollback() throws Exception {
         final int entitiesCountBefore = bookRepository.getBooks().size();
 
+        transactionManager.begin();
         bookRepository.fileBook("test");
+        transactionManager.rollback();
 
-        Assert.assertEquals(entitiesCountBefore, bookRepository.getBooks().size());
-        Assert.assertEquals("", messageHandler.get());
-    }
-
-    @Test(expected = TransactionalException.class)
-    public void testWithoutTransaction() {
-        bookRepository.fileBook("test");
+        Assert.assertEquals("Book filing was canceled no new book expected",
+            entitiesCountBefore, bookRepository.getBooks().size());
+        Assert.assertFalse("Sending the message was rolled back. No message expected.",
+            messageHandler.get().isPresent());
     }
 
 }
