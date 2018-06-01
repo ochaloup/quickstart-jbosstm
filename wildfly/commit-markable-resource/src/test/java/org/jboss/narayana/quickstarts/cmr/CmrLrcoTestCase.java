@@ -42,10 +42,10 @@ import org.junit.runner.RunWith;
 public class CmrLrcoTestCase {
 
     @Inject
-    private MessageHandler quickstartQueue;
+    private MessageHandler messageHandler;
 
     @Inject
-    private BookProcessor quickstartEntityRepository;
+    private BookProcessor bookRepository;
 
 
     private TransactionManager transactionManager;
@@ -65,48 +65,29 @@ public class CmrLrcoTestCase {
         return war;
     }
 
-    @Before
-    public void before() throws NamingException {
-        transactionManager = (TransactionManager) new InitialContext().lookup("java:/jboss/TransactionManager");
-    }
-
-    @After
-    public void after() {
-        try {
-            transactionManager.rollback();
-        } catch (final Throwable t) {
-        }
-    }
-
     @Test
     public void testCommit() throws Exception {
-        final int entitiesCountBefore = quickstartEntityRepository.getBooks().size();
+        final int entitiesCountBefore = bookRepository.getBooks().size();
 
-        transactionManager.begin();
-        quickstartEntityRepository.fileBook("test");
-        quickstartQueue.send("testCommit");
-        transactionManager.commit();
+        int bookId = bookRepository.fileBook("test");
 
-        Assert.assertEquals(entitiesCountBefore + 1, quickstartEntityRepository.getBooks().size());
-        Assert.assertEquals("testCommit", quickstartQueue.get());
+        Assert.assertEquals(entitiesCountBefore + 1, bookRepository.getBooks().size());
+        Assert.assertEquals(BookProcessor.textOfMessage(bookId, "test"), messageHandler.get());
     }
 
     @Test
     public void testRollback() throws Exception {
-        final int entitiesCountBefore = quickstartEntityRepository.getBooks().size();
+        final int entitiesCountBefore = bookRepository.getBooks().size();
 
-        transactionManager.begin();
-        quickstartEntityRepository.fileBook("test");
-        quickstartQueue.send("testRollback");
-        transactionManager.rollback();
+        bookRepository.fileBook("test");
 
-        Assert.assertEquals(entitiesCountBefore, quickstartEntityRepository.getBooks().size());
-        Assert.assertEquals("", quickstartQueue.get());
+        Assert.assertEquals(entitiesCountBefore, bookRepository.getBooks().size());
+        Assert.assertEquals("", messageHandler.get());
     }
 
     @Test(expected = TransactionalException.class)
     public void testWithoutTransaction() {
-        quickstartEntityRepository.fileBook("test");
+        bookRepository.fileBook("test");
     }
 
 }

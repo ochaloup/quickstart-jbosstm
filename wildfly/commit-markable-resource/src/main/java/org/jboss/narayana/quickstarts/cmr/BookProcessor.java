@@ -43,6 +43,10 @@ public class BookProcessor {
     @Inject
     private MessageHandler messageHandler;
 
+    public static String textOfMessage(int id, String title) {
+        return id + "#" + title;
+    }
+
     @SuppressWarnings("unchecked")
     @Transactional
     public List<BookEntity> getBooks() {
@@ -57,7 +61,7 @@ public class BookProcessor {
         BookEntity book = new BookEntity().setTitle(title);
         Integer id = this.save(book);
 
-        messageHandler.send(id + ", " + title);
+        messageHandler.send(textOfMessage(id, title));
 
         log.infof("New book was filed as id: %s, title: %s", id, title);
         return id;

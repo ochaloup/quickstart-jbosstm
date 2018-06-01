@@ -29,14 +29,21 @@
 
     <container qualifier="jbossas-managed" default="true">
         <configuration>
-            <property name="javaVmArguments">${server.jvm.args}</property>
+            <property name="javaVmArguments">${server.jvm.args} -Djboss.modules.system.pkgs=com.sun.tools.attach,org.jboss.byteman -Xbootclasspath/a:${path.tools.jar}</property>
             <property name="serverConfig">standalone-full.xml</property>
             <property name="managementAddress">${node.address}</property>
         </configuration>
     </container>
 
+   	<extension qualifier="byteman">
+	    <property name="autoInstallAgent">true</property>
+	    <property name="agentProperties">org.jboss.byteman.verbose=true</property>
+	</extension>
+
+	<!--
     <engine>
         <property name="deploymentExportPath">/tmp/deployment</property>
     </engine>
+    -->
 
 </arquillian>

@@ -43,18 +43,44 @@
         <jvm.args>-server -Xms64m -Xmx1024m -XX:MaxPermSize=512m ${server.args}</jvm.args>
         <jvm.args.debug></jvm.args.debug>
         <ipv6.server.jvm.args>-Djboss.bind.address=[::1] -Djboss.bind.address.management=[::1] -Djboss.bind.address.unsecure=[::1] -Djava.net.preferIPv4Stack=false -Djava.net.preferIPv6Addresses=true</ipv6.server.jvm.args>
-        
+        <path.tools.jar>${java.home}/../lib/tools.jar</path.tools.jar>
+
         <version.javaee.spec>1.1.1.Final</version.javaee.spec>
         <version.wildfly.logging>5.0.0.Beta5</version.wildfly.logging>
 
         <version.junit>4.12</version.junit>
-        <version.org.wildfly.arquillian>2.1.0.Final</version.org.wildfly.arquillian>
-        <version.arquillian.junit>1.4.0.Final</version.arquillian.junit>
         <version.surefire.plugin>2.19.1</version.surefire.plugin>
+        <version.arquillian>1.1.11.Final</version.arquillian>
+        <version.arquillian.wildfly>2.1.0.Final</version.arquillian.wildfly>
+        <version.arquillian.byteman>1.0.0.Alpha4</version.arquillian.byteman>
+        <version.byteman>4.0.2</version.byteman>
     </properties>
 
     <build>
         <finalName>servlet-cmr</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-enforcer-plugin</artifactId>
+                <version>3.0.0-M1</version>
+                <executions>
+                    <execution>
+                        <id>enforce-environment-variable-java-home-is-set</id>
+                        <goals>
+                            <goal>enforce</goal>
+                        </goals>
+                        <configuration>
+                            <rules>
+                                <requireEnvironmentVariable>
+                                    <variableName>JAVA_HOME</variableName>
+                                </requireEnvironmentVariable>
+                            </rules>
+                            <fail>true</fail>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
     </build>
 
     <dependencyManagement>
@@ -66,13 +92,6 @@
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
-<!--
-            <dependency>
-                <groupId>org.jboss.shrinkwrap</groupId>
-                <artifactId>shrinkwrap-impl-base</artifactId>
-                <version>1.2.6.hacking</version>
-            </dependency>
--->
         </dependencies>
     </dependencyManagement>
 
@@ -124,20 +143,44 @@
         <dependency>
             <groupId>org.jboss.arquillian.junit</groupId>
             <artifactId>arquillian-junit-container</artifactId>
-            <version>${version.arquillian.junit}</version>
+            <version>${version.arquillian}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.protocol</groupId>
             <artifactId>arquillian-protocol-servlet</artifactId>
-            <version>${version.arquillian.junit}</version>
+            <version>${version.arquillian}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.wildfly.arquillian</groupId>
+            <artifactId>wildfly-arquillian-container-managed</artifactId>
+            <version>${version.arquillian.wildfly}</version>
             <scope>test</scope>
         </dependency>
         <dependency>
             <groupId>org.jboss.arquillian.core</groupId>
             <artifactId>arquillian-core-api</artifactId>
-            <version>${version.arquillian.junit}</version>
+            <version>${version.arquillian}</version>
             <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.arquillian.extension</groupId>
+            <artifactId>arquillian-extension-byteman</artifactId>
+            <version>${version.arquillian.byteman}</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman</artifactId>
+            <version>${version.byteman}</version>
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.jboss.byteman</groupId>
+            <artifactId>byteman-submit</artifactId>
+            <version>${version.byteman}</version>
+            <scope>provided</scope>
         </dependency>
     </dependencies>
 
@@ -147,14 +190,6 @@
             <activation>
                 <activeByDefault>true</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.wildfly.arquillian</groupId>
-                    <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>${version.org.wildfly.arquillian}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -165,9 +200,9 @@
                             <systemPropertyVariables combine.children="append">
                                 <server.jvm.args>${jvm.args} ${jvm.args.debug}</server.jvm.args>
                                 <node.address>127.0.0.1</node.address>
+                                <path.tools.jar>${path.tools.jar}</path.tools.jar>
                             </systemPropertyVariables>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
-                            <!--<workingDirectory>workdir</workingDirectory>-->
                         </configuration>
                     </plugin>
                 </plugins>
@@ -178,14 +213,6 @@
             <activation>
                 <activeByDefault>false</activeByDefault>
             </activation>
-            <dependencies>
-                <dependency>
-                    <groupId>org.wildfly.arquillian</groupId>
-                    <artifactId>wildfly-arquillian-container-managed</artifactId>
-                    <version>${version.org.wildfly.arquillian}</version>
-                    <scope>test</scope>
-                </dependency>
-            </dependencies>
             <build>
                 <plugins>
                     <plugin>
@@ -197,6 +224,7 @@
                             <systemPropertyVariables combine.children="append">
                                 <server.jvm.args>${jvm.args} ${ipv6.server.jvm.args} ${jvm.args.debug}</server.jvm.args>
                                 <node.address>[::1]</node.address>
+                                <path.tools.jar>${path.tools.jar}</path.tools.jar>
                             </systemPropertyVariables>
                             <redirectTestOutputToFile>true</redirectTestOutputToFile>
                         </configuration>
