@@ -1,1 +1,0 @@
-/subsystem=transactions/commit-markable-resource='java:jboss/datasources/jdbc-cmr':add()

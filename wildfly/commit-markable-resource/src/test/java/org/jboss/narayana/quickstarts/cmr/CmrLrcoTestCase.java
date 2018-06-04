@@ -17,9 +17,6 @@
 package org.jboss.narayana.quickstarts.cmr;
 
 
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.SQLException;
 import java.util.Optional;
 
 import javax.inject.Inject;
@@ -44,9 +41,12 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
-import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.wildfly.extras.creaper.core.online.FailuresAllowedBlock;
+import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
+import org.wildfly.extras.creaper.core.online.OnlineOptions;
+import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
 
 // TODO: https://stackoverflow.com/questions/29183503/start-h2-database-programmatically/29184321
 @RunWith(Arquillian.class)
@@ -54,14 +54,25 @@ import org.junit.runner.RunWith;
 public class CmrLrcoTestCase {
 
     public static class ServerCmrSetup implements ServerSetupTask {
-
         @Override
         public void setup(ManagementClient managementClient, String containerId) throws Exception {
+            OnlineManagementClient creaper = org.wildfly.extras.creaper.core.ManagementClient.online(
+                OnlineOptions.standalone().wrap(managementClient.getControllerClient()));
+
+            try(FailuresAllowedBlock allowedBlock = creaper.allowFailures()) {
+                creaper.execute("/subsystem=transactions/commit-markable-resource=\"java:jboss/datasources/jdbc-cmr\":add()");
+            }
+            new Administration(creaper).reload();
         }
 
         @Override
         public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
-            // nothing now
+            OnlineManagementClient creaper = org.wildfly.extras.creaper.core.ManagementClient.online(
+                    OnlineOptions.standalone().wrap(managementClient.getControllerClient()));
+
+            try(FailuresAllowedBlock allowedBlock = creaper.allowFailures()) {
+                creaper.execute("/subsystem=transactions/commit-markable-resource=\"java:jboss/datasources/jdbc-cmr\":remove()");
+            }
         }
     }
 
