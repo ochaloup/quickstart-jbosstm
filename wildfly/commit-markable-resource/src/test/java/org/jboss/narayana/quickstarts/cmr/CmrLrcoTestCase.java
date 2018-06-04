@@ -16,16 +16,24 @@
  */
 package org.jboss.narayana.quickstarts.cmr;
 
+
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.SQLException;
 import java.util.Optional;
 
 import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.transaction.Status;
 import javax.transaction.TransactionManager;
-import javax.transaction.TransactionalException;
 
 import org.jboss.arquillian.container.test.api.Deployment;
+import org.jboss.arquillian.extension.byteman.api.BMRule;
 import org.jboss.arquillian.junit.Arquillian;
+import org.jboss.as.arquillian.api.ServerSetup;
+import org.jboss.as.arquillian.api.ServerSetupTask;
+import org.jboss.as.arquillian.container.ManagementClient;
 import org.jboss.narayana.quickstarts.cmr.arquillian.ArquillianExtension;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.GenericArchive;
@@ -36,12 +44,27 @@ import org.jboss.shrinkwrap.api.spec.WebArchive;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 
 // TODO: https://stackoverflow.com/questions/29183503/start-h2-database-programmatically/29184321
 @RunWith(Arquillian.class)
+@ServerSetup(value = CmrLrcoTestCase.ServerCmrSetup.class)
 public class CmrLrcoTestCase {
+
+    public static class ServerCmrSetup implements ServerSetupTask {
+
+        @Override
+        public void setup(ManagementClient managementClient, String containerId) throws Exception {
+        }
+
+        @Override
+        public void tearDown(ManagementClient managementClient, String containerId) throws Exception {
+            // nothing now
+        }
+    }
+
 
     @Inject
     private MessageHandler messageHandler;
@@ -56,7 +79,9 @@ public class CmrLrcoTestCase {
         WebArchive war = ShrinkWrap.create(WebArchive.class, "cmr.war")
             .addPackages(true, BookEntity.class.getPackage().getName())
             .deletePackage(ArquillianExtension.class.getPackage())
+            .addClass(ServerSetupTask.class)
             .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
+            .addAsResource("META-INF/cmr-create-script.sql", "META-INF/cmr-create-script.sql")
             .addAsWebInfResource(EmptyAsset.INSTANCE, "beans.xml");
         war.merge(ShrinkWrap.create(GenericArchive.class).as(ExplodedImporter.class)  
             .importDirectory("src/main/webapp").as(GenericArchive.class),  
@@ -89,8 +114,10 @@ public class CmrLrcoTestCase {
 
         Assert.assertEquals("A new book should be filed",
             entitiesCountBefore + 1, bookRepository.getBooks().size());
+        Optional<String> queueMessage = messageHandler.get();
+        Assert.assertTrue("Expecting transaction being committed and message delivered", queueMessage.isPresent());
         Assert.assertEquals("The transaction was committed thus the inform message is expected to be received",
-            BookProcessor.textOfMessage(bookId, "test"), messageHandler.get().get());
+            BookProcessor.textOfMessage(bookId, "test"), queueMessage.get());
     }
 
     @Test
@@ -105,6 +132,34 @@ public class CmrLrcoTestCase {
             entitiesCountBefore, bookRepository.getBooks().size());
         Assert.assertFalse("Sending the message was rolled back. No message expected.",
             messageHandler.get().isPresent());
+    }
+
+
+    @Test
+    @BMRule(
+        name = "Throw exception before prepare being finished",
+        condition = "NOT flagged(\"lrcoflag\")",
+        targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "save_state",
+        action = "flag(\"lrcoflag\"), throw new java.lang.RuntimeException(\"byteman rules\")")
+    public void testLrcoFailure() throws Exception {
+        final int entitiesCountBefore = bookRepository.getBooks().size();
+
+        transactionManager.begin();
+        int bookId = bookRepository.fileBook("test");
+        try {
+        	transactionManager.commit();
+        } catch (Exception re) {
+        	if(transactionManager.getStatus() == Status.STATUS_ACTIVE)
+        		transactionManager.rollback();
+			if(!re.getMessage().equals("byteman rules"))
+			    throw new IllegalStateException("test failed, not expected exception caught", re);
+			// else: ignore as expected
+		}
+
+        Assert.assertEquals("A new book should be filed",
+            entitiesCountBefore + 1, bookRepository.getBooks().size());
+        Assert.assertEquals("The transaction was committed thus the inform message is expected to be received",
+            BookProcessor.textOfMessage(bookId, "test"), messageHandler.get().get());
     }
 
 }

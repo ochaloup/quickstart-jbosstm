@@ -37,7 +37,7 @@ import org.jboss.logging.Logger;
 public class BookProcessor {
     private static final Logger log = Logger.getLogger(BookProcessor.class);
 
-    @PersistenceContext(unitName = "jdbc-datasource")
+    @PersistenceContext(unitName = "jdbc-cmr-datasource")
     private EntityManager entityManager;
 
     @Inject

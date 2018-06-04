@@ -26,7 +26,7 @@
     <!-- The datasource is bound into JNDI at this location, referenced at META-INF/persistence.xml -->
     <datasource jndi-name="java:jboss/datasources/jdbc" pool-name="jdbc-datasource"
                 enabled="true" use-java-context="true">
-        <connection-url>jdbc:h2:tcp://localhost/~/test</connection-url>
+        <connection-url>jdbc:h2:mem:jdbcdatasource</connection-url>
         <driver>h2</driver> <!-- driver 'h2' defined in the default WFLY configuration -->
         <security>
             <user-name>sa</user-name>
@@ -36,7 +36,7 @@
     
     <datasource jndi-name="java:jboss/datasources/jdbc-cmr" pool-name="jdbc-cmr-datasource"
                 enabled="true" use-java-context="true" connectable="true">
-        <connection-url>jdbc:h2:tcp://localhost/~/test</connection-url>
+        <connection-url>jdbc:h2:mem:cmrdatasource</connection-url>
         <driver>h2</driver>
         <security>
             <user-name>sa</user-name>
