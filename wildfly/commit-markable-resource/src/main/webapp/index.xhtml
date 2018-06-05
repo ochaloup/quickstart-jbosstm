@@ -30,8 +30,8 @@
 <h:body>
 	<h1>Books in repository:</h1>
 	<p>
-		<h:outputText value="No book in the repository." rendered="#{empty bookProcessor.books}" />
-		<h:dataTable var="_book" value="#{bookProcessor.books}" rendered="#{not empty bookProcessor.books}">
+		<h:outputText value="No book in the repository." rendered="#{empty bookProcessorCmr.books}" />
+		<h:dataTable var="_book" value="#{bookProcessorCmr.books}" rendered="#{not empty bookProcessorCmr.books}">
 			<h:column>
 				<f:facet name="header">ID</f:facet>  
                 #{_book.id}  

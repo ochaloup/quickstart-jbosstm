@@ -19,43 +19,41 @@ package org.jboss.narayana.quickstarts.cmr;
 
 import java.util.List;
 
-import javax.enterprise.context.Dependent;
 import javax.inject.Inject;
-import javax.inject.Named;
 import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.transaction.Transactional;
 
 import org.jboss.logging.Logger;
 
 /**
  * Maintaining books in the system.
  */
-@Dependent
-@Named
-public class BookProcessor {
+abstract class BookProcessor {
     private static final Logger log = Logger.getLogger(BookProcessor.class);
-
-    @PersistenceContext(unitName = "jdbc-cmr-datasource")
-    private EntityManager entityManager;
 
     @Inject
     private MessageHandler messageHandler;
+
+    // define what entity manager to use
+    protected abstract EntityManager getEntityManager();
 
     public static String textOfMessage(int id, String title) {
         return id + "#" + title;
     }
 
     @SuppressWarnings("unchecked")
-    @Transactional
-    public List<BookEntity> getBooks() {
-        final Query query = entityManager.createQuery("select book from " + BookEntity.class.getSimpleName() + " book");
+    protected List<BookEntity> getBooks() {
+        final Query query = getEntityManager().createQuery("select book from " + BookEntity.class.getSimpleName() + " book");
         return (List<BookEntity>) query.getResultList();
     }
 
-    @Transactional(Transactional.TxType.REQUIRED)
-    public Integer fileBook(String title) {
+    protected BookEntity getBookById(int id) {
+        final Query query = getEntityManager().createQuery("select book from " + BookEntity.class.getSimpleName() + " book where id = :id");
+        query.setParameter("id", id);
+        return (BookEntity) query.getSingleResult();
+    }
+
+    protected Integer fileBook(String title) {
         if(title == null) throw new NullPointerException("title");
 
         BookEntity book = new BookEntity().setTitle(title);
@@ -67,12 +65,11 @@ public class BookProcessor {
         return id;
     }
 
-    @Transactional(Transactional.TxType.MANDATORY)
     private Integer save(BookEntity book) {
         if (book.isTransient()) {
-            entityManager.persist(book);
+            getEntityManager().persist(book);
         } else {
-            entityManager.merge(book);
+            getEntityManager().merge(book);
         }
         return book.getId();
     }

@@ -20,16 +20,20 @@ package org.jboss.narayana.quickstarts.cmr.jsf;
 import javax.enterprise.context.RequestScoped;
 import javax.inject.Inject;
 import javax.inject.Named;
+import javax.transaction.Transactional;
 
-import org.jboss.narayana.quickstarts.cmr.BookProcessor;
+import org.jboss.narayana.quickstarts.cmr.BookProcessorCmr;
 
+/**
+ * used at jsf page <code>index.xhtml</code> placed at <code>src/main/webapp</code> 
+ */
 @Named
 @RequestScoped
 public class Book {
     private String title;
 
     @Inject
-    private BookProcessor bookProcessor;
+    private BookProcessorCmr bookProcessor;
 
     public String getTitle() {
         return title;
@@ -39,6 +43,7 @@ public class Book {
         this.title = title;
     }
 
+    @Transactional
     public void submit() {
         System.out.println("To save book with title: " + this.title);
         bookProcessor.fileBook(this.title);

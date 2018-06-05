@@ -18,6 +18,7 @@ package org.jboss.narayana.quickstarts.cmr;
 
 
 import java.util.Optional;
+import java.util.Random;
 
 import javax.inject.Inject;
 import javax.naming.InitialContext;
@@ -31,7 +32,6 @@ import org.jboss.arquillian.junit.Arquillian;
 import org.jboss.as.arquillian.api.ServerSetup;
 import org.jboss.as.arquillian.api.ServerSetupTask;
 import org.jboss.as.arquillian.container.ManagementClient;
-import org.jboss.narayana.quickstarts.cmr.arquillian.ArquillianExtension;
 import org.jboss.shrinkwrap.api.Filters;
 import org.jboss.shrinkwrap.api.GenericArchive;
 import org.jboss.shrinkwrap.api.ShrinkWrap;
@@ -48,7 +48,6 @@ import org.wildfly.extras.creaper.core.online.OnlineManagementClient;
 import org.wildfly.extras.creaper.core.online.OnlineOptions;
 import org.wildfly.extras.creaper.core.online.operations.admin.Administration;
 
-// TODO: https://stackoverflow.com/questions/29183503/start-h2-database-programmatically/29184321
 @RunWith(Arquillian.class)
 @ServerSetup(value = CmrLrcoTestCase.ServerCmrSetup.class)
 public class CmrLrcoTestCase {
@@ -76,12 +75,14 @@ public class CmrLrcoTestCase {
         }
     }
 
-
     @Inject
     private MessageHandler messageHandler;
 
     @Inject
-    private BookProcessor bookRepository;
+    private BookProcessorLrco bookProcessorLrco;
+
+    @Inject
+    private BookProcessorCmr bookProcessorCmr;
 
     private TransactionManager transactionManager;
 
@@ -89,7 +90,6 @@ public class CmrLrcoTestCase {
     public static WebArchive createTestArchive() {
         WebArchive war = ShrinkWrap.create(WebArchive.class, "cmr.war")
             .addPackages(true, BookEntity.class.getPackage().getName())
-            .deletePackage(ArquillianExtension.class.getPackage())
             .addClass(ServerSetupTask.class)
             .addAsResource("META-INF/persistence.xml", "META-INF/persistence.xml")
             .addAsResource("META-INF/cmr-create-script.sql", "META-INF/cmr-create-script.sql")
@@ -116,15 +116,15 @@ public class CmrLrcoTestCase {
     }
 
     @Test
-    public void testCommit() throws Exception {
-        final int entitiesCountBefore = bookRepository.getBooks().size();
+    public void testLrcoCommit() throws Exception {
+        final int entitiesCountBefore = bookProcessorLrco.getBooks().size();
 
         transactionManager.begin();
-        int bookId = bookRepository.fileBook("test");
+        int bookId = bookProcessorLrco.fileBook("test");
         transactionManager.commit();
 
         Assert.assertEquals("A new book should be filed",
-            entitiesCountBefore + 1, bookRepository.getBooks().size());
+            entitiesCountBefore + 1, bookProcessorLrco.getBooks().size());
         Optional<String> queueMessage = messageHandler.get();
         Assert.assertTrue("Expecting transaction being committed and message delivered", queueMessage.isPresent());
         Assert.assertEquals("The transaction was committed thus the inform message is expected to be received",
@@ -132,31 +132,31 @@ public class CmrLrcoTestCase {
     }
 
     @Test
-    public void testRollback() throws Exception {
-        final int entitiesCountBefore = bookRepository.getBooks().size();
+    public void testLrcoRollback() throws Exception {
+        final int entitiesCountBefore = bookProcessorLrco.getBooks().size();
 
         transactionManager.begin();
-        bookRepository.fileBook("test");
+        bookProcessorLrco.fileBook("test");
         transactionManager.rollback();
 
         Assert.assertEquals("Book filing was canceled no new book expected",
-            entitiesCountBefore, bookRepository.getBooks().size());
+            entitiesCountBefore, bookProcessorLrco.getBooks().size());
         Assert.assertFalse("Sending the message was rolled back. No message expected.",
             messageHandler.get().isPresent());
     }
 
-
     @Test
     @BMRule(
-        name = "Throw exception before prepare being finished",
+        name = "Throw exception before prepare being finished simulating jvm crash with LRCO",
         condition = "NOT flagged(\"lrcoflag\")",
         targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "save_state",
         action = "flag(\"lrcoflag\"), throw new java.lang.RuntimeException(\"byteman rules\")")
     public void testLrcoFailure() throws Exception {
-        final int entitiesCountBefore = bookRepository.getBooks().size();
+        final int entitiesCountBefore = bookProcessorLrco.getBooks().size();
+        String bookTitle = "test" + new Random().nextInt(999);
 
         transactionManager.begin();
-        int bookId = bookRepository.fileBook("test");
+        int bookId = bookProcessorLrco.fileBook(bookTitle);
         try {
         	transactionManager.commit();
         } catch (Exception re) {
@@ -167,10 +167,70 @@ public class CmrLrcoTestCase {
 			// else: ignore as expected
 		}
 
-        Assert.assertEquals("A new book should be filed",
-            entitiesCountBefore + 1, bookRepository.getBooks().size());
-        Assert.assertEquals("The transaction was committed thus the inform message is expected to be received",
-            BookProcessor.textOfMessage(bookId, "test"), messageHandler.get().get());
+        // LRCO transaction consistency failure - if error happens just at the place before prepare phase
+        // ends then the transaction consistency is in danger
+        Assert.assertEquals("LRCO causes the book is saved even it should not be for transaction being consistent",
+            entitiesCountBefore + 1, bookProcessorLrco.getBooks().size());
+        Assert.assertEquals("Expected the id was persisted with the generated title but it's different",
+            bookTitle, bookProcessorLrco.getBookById(bookId).getTitle());
+        Assert.assertFalse("The transaction was rolled-back thus no message should be available",
+            messageHandler.get().isPresent());
     }
 
+    @Test
+    public void testCmrCommit() throws Exception {
+        final int entitiesCountBefore = bookProcessorCmr.getBooks().size();
+
+        transactionManager.begin();
+        int bookId = bookProcessorCmr.fileBook("test");
+        transactionManager.commit();
+
+        Assert.assertEquals("A new book should be filed",
+            entitiesCountBefore + 1, bookProcessorCmr.getBooks().size());
+        Optional<String> queueMessage = messageHandler.get();
+        Assert.assertTrue("Expecting transaction being committed and message delivered", queueMessage.isPresent());
+        Assert.assertEquals("The transaction was committed thus the inform message is expected to be received",
+            BookProcessor.textOfMessage(bookId, "test"), queueMessage.get());
+    }
+
+    @Test
+    public void testCmrRollback() throws Exception {
+        final int entitiesCountBefore = bookProcessorCmr.getBooks().size();
+
+        transactionManager.begin();
+        bookProcessorCmr.fileBook("test");
+        transactionManager.rollback();
+
+        Assert.assertEquals("Book filing was canceled no new book expected",
+            entitiesCountBefore, bookProcessorCmr.getBooks().size());
+        Assert.assertFalse("Sending the message was rolled back. No message expected.",
+            messageHandler.get().isPresent());
+    }
+
+    @Test
+    @BMRule(
+        name = "Throw exception before prepare being finished simulating jvm crash with CMR",
+        condition = "NOT flagged(\"cmrflag\")",
+        targetClass = "com.arjuna.ats.arjuna.coordinator.BasicAction", targetMethod = "save_state",
+        action = "flag(\"cmrflag\"), throw new java.lang.RuntimeException(\"byteman rules\")")
+    public void testCmrWhileLrcoFailing() throws Exception {
+        final int entitiesCountBefore = bookProcessorCmr.getBooks().size();
+
+        transactionManager.begin();
+        bookProcessorCmr.fileBook("test");
+        try {
+            transactionManager.commit();
+        } catch (Exception re) {
+            if(transactionManager.getStatus() == Status.STATUS_ACTIVE)
+                transactionManager.rollback();
+            if(!re.getMessage().equals("byteman rules"))
+                throw new IllegalStateException("test failed, not expected exception caught", re);
+            // else: ignore as expected
+        }
+
+        Assert.assertEquals("Book filing was canceled no new book expected",
+            entitiesCountBefore, bookProcessorCmr.getBooks().size());
+        Assert.assertFalse("Sending the message was rolled back. No message expected.",
+            messageHandler.get().isPresent());
+    }
 }
