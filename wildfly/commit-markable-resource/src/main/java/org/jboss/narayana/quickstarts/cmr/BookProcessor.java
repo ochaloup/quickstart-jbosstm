@@ -19,19 +19,29 @@ package org.jboss.narayana.quickstarts.cmr;
 
 import java.util.List;
 
+import javax.annotation.Resource;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
 import javax.transaction.Transactional;
-import javax.transaction.Transactional.TxType;
 
 import org.jboss.logging.Logger;
 
 /**
  * Maintaining books in the system.
  */
+@Transactional
 abstract class BookProcessor {
     private static final Logger log = Logger.getLogger(BookProcessor.class);
+
+    @PersistenceContext(unitName = "jdbc-datasource")
+    private EntityManager em;
+
+    @Resource(lookup = "java:/TransactionManager")
+    private TransactionManager tm;
 
     @Inject
     private MessageHandler messageHandler;
@@ -44,19 +54,21 @@ abstract class BookProcessor {
     }
 
     @SuppressWarnings("unchecked")
-    protected List<BookEntity> getBooks() {
-        final Query query = getEntityManager().createQuery("select book from " + BookEntity.class.getSimpleName() + " book");
+    @Transactional
+    public List<BookEntity> getBooks() {
+        final Query query = em.createQuery("select book from " + BookEntity.class.getSimpleName() + " book");
         return (List<BookEntity>) query.getResultList();
     }
 
-    protected BookEntity getBookById(int id) {
-        final Query query = getEntityManager().createQuery("select book from " + BookEntity.class.getSimpleName() + " book where id = :id");
+    @Transactional
+    public BookEntity getBookById(int id) {
+        final Query query = em.createQuery("select book from " + BookEntity.class.getSimpleName() + " book where id = :id");
         query.setParameter("id", id);
         return (BookEntity) query.getSingleResult();
     }
 
     @Transactional
-    protected Integer fileBook(String title) {
+    public Integer fileBook(String title) {
         if(title == null) throw new NullPointerException("title");
 
         BookEntity book = new BookEntity().setTitle(title);
@@ -69,10 +81,15 @@ abstract class BookProcessor {
     }
 
     private Integer save(BookEntity book) {
+        try {
+            System.out.println("txn is: " + tm.getTransaction());
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
         if (book.isTransient()) {
-            getEntityManager().persist(book);
+            em.persist(book);
         } else {
-            getEntityManager().merge(book);
+            em.merge(book);
         }
         return book.getId();
     }
