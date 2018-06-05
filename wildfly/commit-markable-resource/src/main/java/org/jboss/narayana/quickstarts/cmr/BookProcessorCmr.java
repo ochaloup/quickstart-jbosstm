@@ -10,7 +10,6 @@ import javax.transaction.Transactional;
 
 @Dependent
 @Named
-@Transactional
 public class BookProcessorCmr extends BookProcessor {
 
     @PersistenceContext(unitName = "jdbc-cmr-datasource")

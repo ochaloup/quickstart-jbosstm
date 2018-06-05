@@ -22,6 +22,8 @@ import java.util.List;
 import javax.inject.Inject;
 import javax.persistence.EntityManager;
 import javax.persistence.Query;
+import javax.transaction.Transactional;
+import javax.transaction.Transactional.TxType;
 
 import org.jboss.logging.Logger;
 
@@ -53,6 +55,7 @@ abstract class BookProcessor {
         return (BookEntity) query.getSingleResult();
     }
 
+    @Transactional
     protected Integer fileBook(String title) {
         if(title == null) throw new NullPointerException("title");
 

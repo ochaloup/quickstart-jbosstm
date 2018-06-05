@@ -28,14 +28,14 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import org.jboss.narayana.quickstarts.cmr.BookEntity;
-import org.jboss.narayana.quickstarts.cmr.BookProcessorCmr;
+import org.jboss.narayana.quickstarts.cmr.BookProcessorLrco;
 
 @WebServlet(name="BookServlet", urlPatterns={"/servlet"})
 public class BookServlet extends HttpServlet {
     private static final long serialVersionUID = 1L;
 
     @Inject
-    private BookProcessorCmr bookProcessor;
+    private BookProcessorLrco bookProcessor;
         
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
