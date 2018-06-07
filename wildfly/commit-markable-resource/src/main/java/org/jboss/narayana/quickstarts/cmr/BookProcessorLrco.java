@@ -1,11 +1,11 @@
 package org.jboss.narayana.quickstarts.cmr;
 
-import javax.enterprise.context.Dependent;
+import javax.enterprise.context.RequestScoped;
 import javax.inject.Named;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 
-@Dependent
+@RequestScoped
 @Named
 public class BookProcessorLrco extends BookProcessor {
 
@@ -16,4 +16,10 @@ public class BookProcessorLrco extends BookProcessor {
     protected EntityManager getEntityManager() {
         return em;
     }
+
+    /*
+    public Integer fileBook(String title) {
+        return super.fileBook(title);
+    }
+    */
 }

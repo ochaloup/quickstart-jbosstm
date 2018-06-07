@@ -104,7 +104,7 @@ public class CmrLrcoTestCase {
 
     @Before
     public void before() throws NamingException {
-        // transactionManager = (TransactionManager) new InitialContext().lookup("java:/jboss/TransactionManager");
+        transactionManager = (TransactionManager) new InitialContext().lookup("java:/jboss/TransactionManager");
     }
 
     @After

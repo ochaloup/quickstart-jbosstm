@@ -62,6 +62,7 @@ abstract class BookProcessor {
 
     @Transactional
     public BookEntity getBookById(int id) {
+        tellTm();
         final Query query = em.createQuery("select book from " + BookEntity.class.getSimpleName() + " book where id = :id");
         query.setParameter("id", id);
         return (BookEntity) query.getSingleResult();
@@ -70,6 +71,7 @@ abstract class BookProcessor {
     @Transactional
     public Integer fileBook(String title) {
         if(title == null) throw new NullPointerException("title");
+        tellTm();
 
         BookEntity book = new BookEntity().setTitle(title);
         Integer id = this.save(book);
@@ -81,16 +83,20 @@ abstract class BookProcessor {
     }
 
     private Integer save(BookEntity book) {
-        try {
-            System.out.println("txn is: " + tm.getTransaction());
-        } catch (SystemException e) {
-            e.printStackTrace();
-        }
+        tellTm();
         if (book.isTransient()) {
             em.persist(book);
         } else {
             em.merge(book);
         }
         return book.getId();
+    }
+
+    private void tellTm() {
+        try {
+            System.out.println("txn is: " + tm.getTransaction());
+        } catch (SystemException e) {
+            e.printStackTrace();
+        }
     }
 }

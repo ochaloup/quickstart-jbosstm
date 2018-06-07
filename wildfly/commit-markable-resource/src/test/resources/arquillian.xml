@@ -29,7 +29,7 @@
 
     <container qualifier="jbossas-managed" default="true">
         <configuration>
-            <property name="javaVmArguments">${server.jvm.args} -Djboss.modules.system.pkgs=com.sun.tools.attach,org.jboss.byteman -Xbootclasspath/a:${path.tools.jar}</property>
+            <property name="javaVmArguments">${server.jvm.args} -Djboss.modules.system.pkgs=com.sun.tools.attach,org.jboss.byteman -Xbootclasspath/a:${path.tools.jar} -Dorg.jboss.weld.proxy.dump=/tmp/cdidump/</property>
             <property name="serverConfig">standalone-full.xml</property>
             <property name="managementAddress">${node.address}</property>
         </configuration>
