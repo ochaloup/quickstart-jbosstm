@@ -24,6 +24,7 @@ import java.io.File;
 
 import javax.transaction.UserTransaction;
 
+import com.arjuna.ats.arjuna.common.MetaObjectStoreEnvironmentBean;
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 
@@ -45,8 +46,7 @@ public class VolatileStoreExample {
     public static void setupStore() throws Exception {
         defaultStoreDir = BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class).getObjectStoreDir();
 
-        BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "default").setObjectStoreType(storeClassName);
-        BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "communicationStore").setObjectStoreType(storeClassName);
+        new MetaObjectStoreEnvironmentBean().setObjectStoreType(storeClassName);
         Util.emptyObjectStore();
     }
 }
