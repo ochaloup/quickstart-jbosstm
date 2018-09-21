@@ -100,7 +100,7 @@
                     </archive>
                 </configuration>
             </plugin>
-            <!-- JBoss AS plugin to deploy war as a convenience -->
+            <!-- WildFly plugin to deploy war as a convenience -->
             <plugin>
                 <groupId>org.wildfly.plugins</groupId>
                 <artifactId>wildfly-maven-plugin</artifactId>
