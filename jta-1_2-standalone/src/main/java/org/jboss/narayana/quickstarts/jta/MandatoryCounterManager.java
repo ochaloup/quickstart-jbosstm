@@ -16,9 +16,13 @@
  */
 package org.jboss.narayana.quickstarts.jta;
 
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 import javax.naming.InitialContext;
 import javax.naming.NamingException;
+import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
 import javax.transaction.UserTransaction;
 
@@ -30,6 +34,9 @@ public class MandatoryCounterManager {
 
     @Inject
     private Counter counter;
+
+    @Inject
+    private LifeCycleCounter lifeCycle;
 
     public boolean isTransactionAvailable() {
         UserTransaction userTransaction = null;
@@ -49,4 +56,7 @@ public class MandatoryCounterManager {
         counter.increment();
     }
 
+    void transactionScopeActivated(@Observes @Initialized(TransactionScoped.class) final Object event, final BeanManager beanManager) {
+        lifeCycle.addEvent(this.getClass().getSimpleName() + "_" + Initialized.class.getSimpleName());
+    }
 }

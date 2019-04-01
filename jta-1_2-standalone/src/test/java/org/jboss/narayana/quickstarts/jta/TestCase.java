@@ -17,7 +17,6 @@
 package org.jboss.narayana.quickstarts.jta;
 
 import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
-import com.arjuna.ats.arjuna.common.arjPropertyManager;
 import com.arjuna.ats.jta.utils.JNDIManager;
 import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
 import org.jboss.weld.environment.se.Weld;
@@ -30,7 +29,6 @@ import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
 
-import javax.naming.InitialContext;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
 import javax.transaction.TransactionalException;
@@ -42,13 +40,13 @@ public class TestCase {
 
     private static final NamingBeanImpl NAMING_BEAN = new NamingBeanImpl();
 
+    private Weld weld;
     private TransactionManager transactionManager;
 
     private RequiredCounterManager requiredCounterManager;
-
     private MandatoryCounterManager mandatoryCounterManager;
+    private LifeCycleCounter lifeCycleCounter;
 
-    private Weld weld;
 
     @BeforeClass
     public static void beforeClass() throws Exception {
@@ -73,15 +71,18 @@ public class TestCase {
 
     @Before
     public void before() throws Exception {
-        transactionManager = (TransactionManager) new InitialContext().lookup("java:/TransactionManager");
-
         // Initialize Weld container
         weld = new Weld();
         final WeldContainer weldContainer = weld.initialize();
 
         // Bootstrap the beans
-        requiredCounterManager = weldContainer.instance().select(RequiredCounterManager.class).get();
-        mandatoryCounterManager = weldContainer.instance().select(MandatoryCounterManager.class).get();
+        requiredCounterManager = weldContainer.select(RequiredCounterManager.class).get();
+        mandatoryCounterManager = weldContainer.select(MandatoryCounterManager.class).get();
+
+        lifeCycleCounter = weldContainer.select(LifeCycleCounter.class).get();
+        lifeCycleCounter.clear();
+
+        transactionManager = weldContainer.select(TransactionManager.class).get();
     }
 
     @After
@@ -127,6 +128,10 @@ public class TestCase {
         Assert.assertEquals(1, requiredCounterManager.getCounter());
         Assert.assertEquals(1, mandatoryCounterManager.getCounter());
 
+        Assert.assertTrue(lifeCycleCounter.containsEvent("RequiredCounterManager.*Initialized"));
+        Assert.assertTrue(lifeCycleCounter.containsEvent("MandatoryCounterManager.*Initialized"));
+        Assert.assertEquals(2, lifeCycleCounter.getEvents().size());
+
         final Transaction suspendedTransaction = transactionManager.suspend();
 
         transactionManager.begin();
@@ -139,6 +144,11 @@ public class TestCase {
         transactionManager.rollback();
         transactionManager.resume(suspendedTransaction);
         transactionManager.rollback();
+
+        // @Initialized of both beans called twice, @Destroy on only one bean twice
+        Assert.assertEquals(6, lifeCycleCounter.getEvents().size());
+        Assert.assertTrue(lifeCycleCounter.containsEvent("RequiredCounterManager.*Destroy"));
+        Assert.assertFalse(lifeCycleCounter.containsEvent("MandatoryCounterManager.*Destroy"));
     }
 
 }

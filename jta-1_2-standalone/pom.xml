@@ -41,7 +41,7 @@
         <version.narayana>5.9.6.Final-SNAPSHOT</version.narayana>
         <version.jnpserver>5.0.3.GA</version.jnpserver>
         <version.junit>4.12</version.junit>
-        <version.weld>2.3.4.Final</version.weld>
+        <version.weld>3.1.0.Final</version.weld>
         <version.jboss-transaction-api>1.0.1.Final</version.jboss-transaction-api>
         <version.log4j>1.2.17</version.log4j>
     </properties>
@@ -92,7 +92,7 @@
         <!-- Standalone CDI container -->
         <dependency>
             <groupId>org.jboss.weld.se</groupId>
-            <artifactId>weld-se</artifactId>
+            <artifactId>weld-se-core</artifactId>
             <version>${version.weld}</version>
         </dependency>
         <dependency>

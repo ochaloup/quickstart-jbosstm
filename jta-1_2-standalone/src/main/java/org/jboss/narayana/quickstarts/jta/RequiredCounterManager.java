@@ -16,29 +16,42 @@
  */
 package org.jboss.narayana.quickstarts.jta;
 
+import javax.enterprise.context.Destroyed;
+import javax.enterprise.context.Initialized;
+import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
-import javax.naming.InitialContext;
-import javax.naming.NamingException;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
+import javax.transaction.TransactionManager;
+import javax.transaction.TransactionScoped;
 import javax.transaction.Transactional;
-import javax.transaction.UserTransaction;
+
+import org.jboss.logging.Logger;
 
 /**
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
-@Transactional
 public class RequiredCounterManager {
+    private static final Logger LOG = Logger.getLogger(RequiredCounterManager.class);
 
     @Inject
     private Counter counter;
 
-    public boolean isTransactionAvailable() {
-        UserTransaction userTransaction = null;
-        try {
-            userTransaction = (UserTransaction) new InitialContext().lookup("java:/UserTransaction");
-        } catch (final NamingException e) {
-        }
+    @Inject
+    private LifeCycleCounter lifeCycle;
 
-        return userTransaction != null;
+    @Inject
+    private TransactionManager transactionManager;
+
+    @Transactional
+    public boolean isTransactionAvailable() {
+        try {
+            return transactionManager.getTransaction().getStatus() == Status.STATUS_ACTIVE;
+        } catch (SystemException se) {
+            throw new IllegalStateException("Transaction manager " + transactionManager
+                    + " is not capable to provide transaction status");
+        }
     }
 
     public int getCounter() {
@@ -49,4 +62,16 @@ public class RequiredCounterManager {
         counter.increment();
     }
 
+    void transactionScopeActivated(@Observes @Initialized(TransactionScoped.class) final Object event, final BeanManager beanManager) {
+        lifeCycle.addEvent(this.getClass().getSimpleName() + "_" + Initialized.class.getSimpleName());
+    }
+
+    void transactionScopeDestroyed(@Observes @Destroyed(TransactionScoped.class) final Object event, final BeanManager beanManager) {
+        try {
+            lifeCycle.addEvent(this.getClass().getSimpleName() + "_" + Destroyed.class.getSimpleName());
+        } catch (Exception e) {
+            LOG.trace("This is the expected situation."
+                    + "The context was destroyed the @Transactional scope is not available at this time.");
+        }
+    }
 }

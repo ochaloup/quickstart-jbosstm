@@ -1,6 +1,6 @@
 /*
  * JBoss, Home of Professional Open Source
- * Copyright 2013, Red Hat, Inc. and/or its affiliates, and individual
+ * Copyright 2019, Red Hat, Inc. and/or its affiliates, and individual
  * contributors by the @authors tag. See the copyright.txt in the
  * distribution for a full listing of individual contributors.
  *
@@ -17,25 +17,31 @@
 
 package org.jboss.narayana.quickstarts.jta;
 
-import java.io.Serializable;
-import java.util.concurrent.atomic.AtomicInteger;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.concurrent.CopyOnWriteArrayList;
 
-import javax.transaction.TransactionScoped;
+import javax.enterprise.context.ApplicationScoped;
 
-/**
- * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
- */
-@TransactionScoped
-public class Counter implements Serializable {
-    private static final long serialVersionUID = 1L;
+@ApplicationScoped
+public class LifeCycleCounter {
+    private final Collection<String> events = new CopyOnWriteArrayList<>();
 
-    private final AtomicInteger counter = new AtomicInteger();
-
-    public int get() {
-        return counter.get();
+    public void clear() {
+        events.clear();
     }
 
-    public void increment() {
-        counter.incrementAndGet();
+    public void addEvent(String event) {
+        events.add(event);
+    }
+
+    public Collection<String> getEvents() {
+        System.out.println(events);
+        return new ArrayList<>(events);
+    }
+
+    public boolean containsEvent(String eventToCheck) {
+        return events.stream()
+            .anyMatch(event -> event.matches(".*" + eventToCheck + ".*"));
     }
 }
