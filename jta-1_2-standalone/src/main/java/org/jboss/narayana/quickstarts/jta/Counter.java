@@ -14,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.jboss.narayana.quickstarts.jta;
 
 import java.io.Serializable;
@@ -23,6 +22,17 @@ import java.util.concurrent.atomic.AtomicInteger;
 import javax.transaction.TransactionScoped;
 
 /**
+ * <p>
+ * Transactional scoped counter.<br/>
+ * Data of the counter are stored along the existence
+ * of the particular transaction.
+ * </p>
+ * <p>
+ * With starting a new transaction the injected counter
+ * is initiated as a new instance.
+ * When transaction finishes the counter is cleared up.
+ * </p>
+ *
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 @TransactionScoped

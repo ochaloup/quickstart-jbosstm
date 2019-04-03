@@ -23,6 +23,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
 
 import javax.enterprise.context.ApplicationScoped;
 
+/**
+ * This counter does not demonstrate specialized JTA
+ * functionality.
+ * It's used to store information
+ * about transaction lifecycle events were invoked.
+ */
 @ApplicationScoped
 public class LifeCycleCounter {
     private final Collection<String> events = new CopyOnWriteArrayList<>();

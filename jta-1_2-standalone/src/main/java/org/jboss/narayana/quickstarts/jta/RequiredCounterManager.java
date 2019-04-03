@@ -30,6 +30,23 @@ import javax.transaction.Transactional;
 import org.jboss.logging.Logger;
 
 /**
+ * <p>
+ * A class with definition of the
+ * {@link Transactional.TxType#REQUIRED} transactional boundary
+ * for one particular method {@link #isTransactionAvailable()}.
+ * </p>
+ * <p>
+ * If the method is invoked with a transactional context being
+ * available the method joins the context.
+ * If there is no context available a new transactional context
+ * is created (a new transaction is started) before the method
+ * code is executed.
+ * </p>
+ * <p>
+ * The class demonstrates the usage of the {@link TransactionScoped} events.
+ * A method can observe the {@link Initialized} and {@link Destroyed} events.
+ * </p>
+ * 
  * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
  */
 public class RequiredCounterManager {

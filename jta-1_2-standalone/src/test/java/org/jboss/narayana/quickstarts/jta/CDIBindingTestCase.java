@@ -16,29 +16,34 @@
  */
 package org.jboss.narayana.quickstarts.jta;
 
-import com.arjuna.ats.arjuna.common.ObjectStoreEnvironmentBean;
-import com.arjuna.ats.jta.utils.JNDIManager;
-import com.arjuna.common.internal.util.propertyservice.BeanPopulator;
-import org.jboss.weld.environment.se.Weld;
-import org.jboss.weld.environment.se.WeldContainer;
-import org.jnp.server.NamingBeanImpl;
-import org.junit.After;
-import org.junit.AfterClass;
-import org.junit.Assert;
-import org.junit.Before;
-import org.junit.BeforeClass;
-import org.junit.Test;
+import java.util.Set;
 
+import javax.enterprise.context.ApplicationScoped;
+import javax.transaction.Status;
+import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import javax.transaction.TransactionalException;
+import javax.transaction.TransactionSynchronizationRegistry;
+
+import org.jboss.weld.bootstrap.event.WeldAfterBeanDiscovery;
+import org.jboss.weld.environment.se.ContainerLifecycleObserver;
+import org.jboss.weld.environment.se.Weld;
+import org.jboss.weld.environment.se.WeldContainer;
+import org.junit.After;
+import org.junit.Assert;
+import org.junit.Before;
+import org.junit.Test;
+
+import com.arjuna.ats.jta.cdi.Bean;
+import com.arjuna.ats.jta.common.jtaPropertyManager;
 
 /**
- * @author <a href="mailto:gytis@redhat.com">Gytis Trikleris</a>
+ * <p>
+ * This test case shows how to initiate the Narayana transaction manager
+ * when used with the CDI standalone container.
+ * </p>
  */
-public class TestCase {
-
-    private static final NamingBeanImpl NAMING_BEAN = new NamingBeanImpl();
+public class CDIBindingTestCase {
 
     private Weld weld;
     private TransactionManager transactionManager;
@@ -47,33 +52,29 @@ public class TestCase {
     private MandatoryCounterManager mandatoryCounterManager;
     private LifeCycleCounter lifeCycleCounter;
 
-
-    @BeforeClass
-    public static void beforeClass() throws Exception {
-        // Start JNDI server
-        NAMING_BEAN.start();
-
-        // Bind JTA implementation with default names
-        JNDIManager.bindJTAImplementation();
-
-        // Set object store location
-        BeanPopulator.getDefaultInstance(ObjectStoreEnvironmentBean.class).setObjectStoreDir("target/tx-object-store");
-        BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "communicationStore")
-                .setObjectStoreDir("target/tx-object-store");
-        BeanPopulator.getNamedInstance(ObjectStoreEnvironmentBean.class, "stateStore")
-                .setObjectStoreDir("target/tx-object-store");
-    }
-
-    @AfterClass
-    public static void afterClass() {
-        NAMING_BEAN.stop();
-    }
-
     @Before
     public void before() throws Exception {
         // Initialize Weld container
         weld = new Weld();
+        ContainerLifecycleObserver<WeldAfterBeanDiscovery> afterBeanDiscovery =
+            ContainerLifecycleObserver.afterBeanDiscovery().priority(999).notify( afterDiscovery -> {
+            /*    afterDiscovery.addBean()
+                    .scope(ApplicationScoped.class)
+                    .types(TransactionManager.class)
+                    .id("Programatic " + TransactionManager.class)
+                    .createWith(tm -> com.arjuna.ats.jta.TransactionManager.transactionManager());
+                    */
+                afterDiscovery.addBean()
+                    .scope(ApplicationScoped.class)
+                    .types(TransactionSynchronizationRegistry.class)
+                    .id("Programatic " + TransactionSynchronizationRegistry.class)
+                    .createWith(tsr -> jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry());
+                });
+        weld.addContainerLifecycleObserver(afterBeanDiscovery);
         final WeldContainer weldContainer = weld.initialize();
+
+        Set<javax.enterprise.inject.spi.Bean<?>> beans = weldContainer.getBeanManager().getBeans(TransactionSynchronizationRegistry.class);
+        System.out.println(beans);
 
         // Bootstrap the beans
         requiredCounterManager = weldContainer.select(RequiredCounterManager.class).get();
@@ -86,37 +87,16 @@ public class TestCase {
     }
 
     @After
-    public void after() {
-        try {
-            transactionManager.rollback();
-        } catch (final Throwable t) {
+    public void after() throws SystemException {
+        // cleaning the transaction state in case of an error
+        if(transactionManager.getTransaction().getStatus() == Status.STATUS_ACTIVE) {
+            try {
+                transactionManager.rollback();
+            } catch (final Throwable ignored) {
+            }
         }
 
         weld.shutdown();
-    }
-
-    @Test
-    public void testRequiredTransactionWithExistingTransaction() throws Exception {
-        transactionManager.begin();
-        Assert.assertTrue(requiredCounterManager.isTransactionAvailable());
-        transactionManager.rollback();
-    }
-
-    @Test
-    public void testRequiredTransactionWithoutExistingTransaction() {
-        Assert.assertTrue(requiredCounterManager.isTransactionAvailable());
-    }
-
-    @Test
-    public void testMandatoryTransactionWithExistingTransaction() throws Exception {
-        transactionManager.begin();
-        Assert.assertTrue(mandatoryCounterManager.isTransactionAvailable());
-        transactionManager.rollback();
-    }
-
-    @Test(expected = TransactionalException.class)
-    public void testMandatoryTransactionWithoutExistingTransaction() {
-        mandatoryCounterManager.isTransactionAvailable();
     }
 
     @Test
