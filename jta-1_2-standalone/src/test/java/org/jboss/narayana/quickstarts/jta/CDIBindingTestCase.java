@@ -16,26 +16,17 @@
  */
 package org.jboss.narayana.quickstarts.jta;
 
-import java.util.Set;
-
-import javax.enterprise.context.ApplicationScoped;
 import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
-import javax.transaction.TransactionSynchronizationRegistry;
 
-import org.jboss.weld.bootstrap.event.WeldAfterBeanDiscovery;
-import org.jboss.weld.environment.se.ContainerLifecycleObserver;
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
-
-import com.arjuna.ats.jta.cdi.Bean;
-import com.arjuna.ats.jta.common.jtaPropertyManager;
 
 /**
  * <p>
@@ -56,25 +47,7 @@ public class CDIBindingTestCase {
     public void before() throws Exception {
         // Initialize Weld container
         weld = new Weld();
-        ContainerLifecycleObserver<WeldAfterBeanDiscovery> afterBeanDiscovery =
-            ContainerLifecycleObserver.afterBeanDiscovery().priority(999).notify( afterDiscovery -> {
-            /*    afterDiscovery.addBean()
-                    .scope(ApplicationScoped.class)
-                    .types(TransactionManager.class)
-                    .id("Programatic " + TransactionManager.class)
-                    .createWith(tm -> com.arjuna.ats.jta.TransactionManager.transactionManager());
-                    */
-                afterDiscovery.addBean()
-                    .scope(ApplicationScoped.class)
-                    .types(TransactionSynchronizationRegistry.class)
-                    .id("Programatic " + TransactionSynchronizationRegistry.class)
-                    .createWith(tsr -> jtaPropertyManager.getJTAEnvironmentBean().getTransactionSynchronizationRegistry());
-                });
-        weld.addContainerLifecycleObserver(afterBeanDiscovery);
         final WeldContainer weldContainer = weld.initialize();
-
-        Set<javax.enterprise.inject.spi.Bean<?>> beans = weldContainer.getBeanManager().getBeans(TransactionSynchronizationRegistry.class);
-        System.out.println(beans);
 
         // Bootstrap the beans
         requiredCounterManager = weldContainer.select(RequiredCounterManager.class).get();
