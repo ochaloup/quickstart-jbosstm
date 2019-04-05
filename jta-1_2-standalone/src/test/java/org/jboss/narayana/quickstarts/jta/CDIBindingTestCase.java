@@ -46,7 +46,9 @@ public class CDIBindingTestCase {
     @Before
     public void before() throws Exception {
         // Initialize Weld container
-        weld = new Weld();
+        weld = new Weld()
+            .addAlternative(SynchronizationProducer.class);
+
         final WeldContainer weldContainer = weld.initialize();
 
         // Bootstrap the beans
@@ -62,7 +64,8 @@ public class CDIBindingTestCase {
     @After
     public void after() throws SystemException {
         // cleaning the transaction state in case of an error
-        if(transactionManager.getTransaction().getStatus() == Status.STATUS_ACTIVE) {
+        if(transactionManager.getTransaction() != null
+                && transactionManager.getTransaction().getStatus() == Status.STATUS_ACTIVE) {
             try {
                 transactionManager.rollback();
             } catch (final Throwable ignored) {
