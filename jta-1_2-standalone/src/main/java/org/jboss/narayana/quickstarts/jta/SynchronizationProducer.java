@@ -10,7 +10,6 @@ import com.arjuna.ats.jta.common.jtaPropertyManager;
 @Alternative
 public class SynchronizationProducer {
 
-    @Alternative
     @Produces
     @ApplicationScoped
     public TransactionSynchronizationRegistry produceSynchroRegistry() {

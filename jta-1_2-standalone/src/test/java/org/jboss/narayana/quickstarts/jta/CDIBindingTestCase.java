@@ -20,6 +20,7 @@ import javax.transaction.Status;
 import javax.transaction.SystemException;
 import javax.transaction.Transaction;
 import javax.transaction.TransactionManager;
+import javax.transaction.TransactionSynchronizationRegistry;
 
 import org.jboss.weld.environment.se.Weld;
 import org.jboss.weld.environment.se.WeldContainer;
@@ -47,7 +48,8 @@ public class CDIBindingTestCase {
     public void before() throws Exception {
         // Initialize Weld container
         weld = new Weld()
-            .addAlternative(SynchronizationProducer.class);
+            .addAlternative(SynchronizationProducer.class)
+            .selectAlternatives(SynchronizationProducer.class);
 
         final WeldContainer weldContainer = weld.initialize();
 
@@ -59,6 +61,8 @@ public class CDIBindingTestCase {
         lifeCycleCounter.clear();
 
         transactionManager = weldContainer.select(TransactionManager.class).get();
+        TransactionSynchronizationRegistry tsr = weldContainer.select(TransactionSynchronizationRegistry.class).get();
+        System.out.println(">>>>>>>>>>>> " + tsr);
     }
 
     @After
