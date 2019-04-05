@@ -34,6 +34,8 @@ Project name | Description | Maven coordinates | Tags
 [ArjunaJTS/standalone](ArjunaJTS/standalone/) | Example of using Narayana JTS and in second part the example of using ORB API to manage remote JTS transaction manager with IIOP calls | _o.j.n.quickstart.jts :jts-standalone_ | _[jts](#jts-tag), [iiop](#iiop-tag), [standalone](#standalone-tag)_
 [atsintegration](atsintegration/) | How to integrate Narayana with and arbitrary Java EE application server | _o.j.n.quickstart.jta :application-server-integration_ | _[narayana.configuration](#narayana-configuration-tag)_
 [agroal](agroal/) | How to integrate Narayana with Agroal jdbc pooling library | _o.j.n.quickstart.jta :agroal_ | _[jta](#jta-tag), [standalone](#standalone-tag), [jdbc](#jdbc-tag)_
+[agroal](agroal/) | How to integrate Narayana with Agroal jdbc pooling library | _o.j.n.quickstart.jta :agroal_ | _[jta](#jta-tag), [standalone](#standalone-tag), [jdbc](#jdbc-tag)_
+
 
 ## Quickstart categorization
 
@@ -48,6 +50,7 @@ Category | List of quickstarts
 **[glassfish](#glassfish-tag-definition)**<a name='glassfish-tag'> | [ArjunaJTS/interop](ArjunaJTS/interop/)
 **[iiop](#iiop-tag-definition)**<a name='iiop-tag'> | [ArjunaJTS/standalone](ArjunaJTS/standalone/)
 **[jdbc](#jdbc-tag-definition)**<a name='jdbc-tag'> | [agroal](agroal/)
+**[cdi](#cdi-tag-definition)**<a name='cdi-tag'> | [jta-1_2-standalone](jta-1_2-standalone/),  	jta-1_2-in-wildfly
 
 ### Tags definition
 
@@ -64,6 +67,7 @@ Category | List of quickstarts
 * **glassfish**<a name='glassfish-tag-definition'> : running on GlassFish application server
 * **iiop**<a name='iiop-tag-definition'> : showing how to use ORB API with transaction manager
 * **jdbc**<a name='jdbc-tag-definition'> : using JDBC api and showing integration with that
+* **cdi**<a name='cdi-tag-definition'> : showing how to use the CDI to be integrated with JTA
 
 
 ## Contacting us
