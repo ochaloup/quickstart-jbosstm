@@ -14,12 +14,13 @@
 		Fifth Floor, Boston, MA 02110-1301, USA. (C) 2009, @author JBoss Inc. (jonathan.halliday@redhat.com) -->
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.jboss.narayana.quickstart</groupId>
-  <artifactId>narayana-quickstarts-all</artifactId>
+  <artifactId>narayana-quickstarts-parent</artifactId>
   <version>5.9.6.Final-SNAPSHOT</version>
   <packaging>pom</packaging>
-  <url>http://www.jboss.org/jbosstm/</url>
-  <name>${project.artifactId}</name>
-  <description>${project.artifactId}</description>
+  <url>http://narayana.io</url>
+  <name>Narayana Quickstarts: Parent</name>
+  <description>Quickstarts showing how to use and integrate Narayana transaction manager</description>
+
   <issueManagement>
     <system>JIRA</system>
     <url>https://jira.jboss.org/jira/browse/JBTM/</url>
@@ -28,6 +29,7 @@
     <system>hudson</system>
     <url>http://hudson.qa.jboss.com/hudson/view/JBossTS/</url>
   </ciManagement>
+
   <developers>
     <developer>
       <id>tomjenkinson</id>
@@ -112,17 +114,83 @@
       <timezone>0</timezone>
     </developer>
   </developers>
+
   <licenses>
     <license>
       <name>LGPL 2.1</name>
       <url>http://www.gnu.org/licenses/lgpl-2.1.html</url>
     </license>
   </licenses>
+
   <scm>
     <connection>scm:git:git@github.com:jbosstm/quickstart.git</connection>
     <developerConnection>scm:git:git@github.com:jbosstm/quickstart.git</developerConnection>
     <url>https://github.com/jbosstm/quickstart</url>
   </scm>
+
+  <properties>
+    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+    <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
+    <maven.compiler.target>1.8</maven.compiler.target>
+    <maven.compiler.source>1.8</maven.compiler.source>
+
+    <version.narayana>5.9.6.Final-SNAPSHOT</version.narayana>
+
+    <version.arquillian>1.1.12.Final</version.arquillian>
+    <version.byteman>4.0.6.Final</version.byteman>
+    <version.junit>4.12</version.junit>
+  </properties>
+
+  <repositories>
+    <repository>
+      <id>jboss-public-repository-group</id>
+      <name>JBoss Public Maven Repository Group</name>
+      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
+      <releases>
+        <enabled>true</enabled>
+      </releases>
+      <snapshots>
+        <enabled>true</enabled>
+      </snapshots>
+    </repository>
+  </repositories>
+
+  <dependencyManagement>
+    <dependencies>
+      <dependency>
+        <groupId>org.jboss.arquillian</groupId>
+        <artifactId>arquillian-bom</artifactId>
+        <version>${version.arquillian}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+  <!--
+      <dependency>
+        <groupId>org.wildfly.arquillian</groupId>
+        <artifactId>wildfly-arquillian-container-managed</artifactId>
+        <version>${version.arquillian.wildfly.container}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.wildfly.arquillian</groupId>
+        <artifactId>wildfly-arquillian-common</artifactId>
+        <version>${version.arquillian.wildfly.container}</version>
+      </dependency>
+      <dependency>
+        <groupId>org.jboss.byteman</groupId>
+        <artifactId>byteman-root</artifactId>
+        <version>${version.byteman}</version>
+        <scope>import</scope>
+        <type>pom</type>
+      </dependency>
+  -->
+      <dependency>
+        <groupId>junit</groupId>
+        <artifactId>junit</artifactId>
+        <version>${version.junit}</version>
+      </dependency>
+    </dependencies>
+  </dependencyManagement>
+
   <modules>
     <module>ArjunaJTS</module>
     <module>transactionaldriver</module>
@@ -144,7 +212,6 @@
     <module>wildfly/commit-markable-resource</module>
     <module>STM</module>
     <module>jts-docker</module>
-    <!-- JBTM-2820 disable the osgi quickstart until the karaf release the 4.1.0-->
     <module>karaf/osgi-jta</module>
     <module>jta-and-hibernate-standalone</module>
   </modules>

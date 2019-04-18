@@ -22,25 +22,19 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jboss.narayana.quickstart</groupId>
+  <parent>
+    <groupId>org.jboss.narayana.quickstart</groupId>
+    <artifactId>narayana-quickstarts-parent</artifactId>
+    <version>5.9.6.Final-SNAPSHOT</version>
+  </parent>
   <artifactId>application-server-integration</artifactId>
-  <version>5.9.6.Final-SNAPSHOT</version>
-  <packaging>jar</packaging>
-  <name>narayana application server intergration</name>
+  <name>Narayana Quickstarts: application server intergration</name>
   <description>Example of possible integration of Narayana to an arbitrary application server</description>
-
-  <properties>
-    <version.jboss.logging>3.1.0.GA</version.jboss.logging>
-    <version.junit>4.8.2</version.junit>
-    <version.narayana>5.9.6.Final-SNAPSHOT</version.narayana>
-    <version.transaction.api>1.0.1.Final</version.transaction.api>
-  </properties>
 
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec.javax.transaction</groupId>
-      <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-      <version>${version.transaction.api}</version>
+      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
@@ -55,13 +49,11 @@
     <dependency>
       <groupId>org.jboss.logging</groupId>
       <artifactId>jboss-logging</artifactId>
-      <version>${version.jboss.logging}</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>

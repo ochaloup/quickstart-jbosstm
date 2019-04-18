@@ -23,13 +23,15 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
     <modelVersion>4.0.0</modelVersion>
-
-    <groupId>org.jboss.narayana.quickstarts.spring</groupId>
-    <artifactId>spring-all</artifactId>
-    <version>5.9.6.Final-SNAPSHOT</version>
+    <parent>
+        <groupId>org.jboss.narayana.quickstart</groupId>
+        <artifactId>narayana-quickstarts-parent</artifactId>
+        <version>5.9.6.Final-SNAPSHOT</version>
+    </parent>
+    <groupId>org.jboss.narayana.quickstart.spring</groupId>
+    <artifactId>narayana-quickstarts-spring-all</artifactId>
     <packaging>pom</packaging>
-
-    <name>Narayana and Spring Quickstarts</name>
+    <name>Narayana Quickstarts: Spring</name>
     <description>Examples show how to integrate with Spring</description>
 
     <url>http://jboss.org/jbosstm</url>
