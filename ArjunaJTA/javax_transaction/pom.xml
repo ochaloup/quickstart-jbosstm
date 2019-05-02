@@ -21,19 +21,17 @@
 ~ 02110-1301 USA, or see the FSF site: http://www.fsf.org.
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jboss.narayana.quickstart.jta</groupId>
-    <artifactId>narayana-quickstarts-jta</artifactId>
+    <groupId>org.jboss.narayana.quickstart</groupId>
+    <artifactId>jta-all</artifactId>
     <version>5.9.6.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <description>
-	Examples showing how to the javax.transaction.Transaction interface. Refer to the readme file for more details.
-	</description>
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>javax_transaction</artifactId>
+  <artifactId>jta-javax-transaction</artifactId>
   <packaging>jar</packaging>
-  <name>Javax Transaction Examples</name>
+  <name>Narayana Quickstarts: JTA javax Example</name>
+  <description>An example showing how to work with the javax.transaction.Transaction interface</description>
   <build>
     <plugins>
       <!-- This plugin allows our example to be executed by maven -->

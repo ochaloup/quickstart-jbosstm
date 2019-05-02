@@ -12,22 +12,22 @@
   along with this distribution; if not, write to the Free Software Foundation, 
   Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301, USA. -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
+  <modelVersion>4.0.0</modelVersion>
   <parent>
-    <groupId>org.jboss.narayana.quickstart.arjunacore</groupId>
-    <artifactId>narayana-quickstarts-core</artifactId>
+    <groupId>org.jboss.narayana.quickstart</groupId>
+    <artifactId>arjuna-core-all</artifactId>
     <version>5.9.6.Final-SNAPSHOT</version>
     <relativePath>../pom.xml</relativePath>
   </parent>
-  <modelVersion>4.0.0</modelVersion>
-  <artifactId>txoj</artifactId>
+  <artifactId>arjuna-core-txoj</artifactId>
   <packaging>jar</packaging>
-  <name>TXOJ example</name>
-  <description>TXOJ example</description>
+  <name>Narayana Quickstarts: Arjuna Core TXOJ Example</name>
+  <description>Arjuna TXOJ example</description>
+
   <properties>
-    <version.narayana>5.9.6.Final-SNAPSHOT</version.narayana>
-    <version.junit>4.12</version.junit>
     <version.wildfly.logging>5.0.0.Beta5</version.wildfly.logging>
   </properties>
+
   <build>
     <plugins>
       <!-- This plugin allows our example to be executed by maven -->
@@ -59,16 +59,8 @@
       <version>${version.narayana}</version>
     </dependency>
     <dependency>
-      <groupId>junit</groupId>
-      <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
-      <scope>test</scope>
-    </dependency>
-    <!-- For logging -->
-    <dependency>
-       <groupId>org.wildfly.core</groupId>
-       <artifactId>wildfly-logging</artifactId>
-       <version>${version.wildfly.logging}</version>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
     </dependency>
   </dependencies>
   <profiles>

@@ -28,8 +28,7 @@
         <artifactId>narayana-quickstarts-parent</artifactId>
         <version>5.9.6.Final-SNAPSHOT</version>
     </parent>
-    <groupId>org.jboss.narayana.quickstart.spring</groupId>
-    <artifactId>narayana-quickstarts-spring-all</artifactId>
+    <artifactId>spring-all</artifactId>
     <packaging>pom</packaging>
     <name>Narayana Quickstarts: Spring</name>
     <description>Examples show how to integrate with Spring</description>

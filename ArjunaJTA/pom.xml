@@ -22,30 +22,18 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jboss.narayana.quickstart.jta</groupId>
-  <artifactId>narayana-quickstarts-jta</artifactId>
-  <version>5.9.6.Final-SNAPSHOT</version>
+  <parent>
+    <groupId>org.jboss.narayana.quickstart</groupId>
+    <artifactId>narayana-quickstarts-parent</artifactId>
+    <version>5.9.6.Final-SNAPSHOT</version>
+  </parent>
+  <artifactId>jta-all</artifactId>
   <packaging>pom</packaging>
-  <name>JBoss JTA Examples</name>
-  <description>All quickstarts of JBoss JTA</description>
-  <repositories>
-    <repository>
-      <id>jboss-public-repository-group</id>
-      <name>JBoss Public Maven Repository Group</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+  <name>Narayana Quickstarts: JTA Examples</name>
+  <description>All quickstarts of Narayana JTA</description>
+
   <properties>
     <version.surefire.plugin>2.19.1</version.surefire.plugin>
-    <version.narayana>5.9.6.Final-SNAPSHOT</version.narayana>
-    <version.junit>4.12</version.junit>
-    <version.wildfly.logging>5.0.0.Beta5</version.wildfly.logging>
   </properties>
   <build>
     <pluginManagement>
@@ -94,15 +82,6 @@
       </plugin>
       <plugin>
         <groupId>org.apache.maven.plugins</groupId>
-        <artifactId>maven-compiler-plugin</artifactId>
-        <version>3.1</version>
-        <configuration>
-          <source>1.6</source>
-          <target>1.6</target>
-        </configuration>
-      </plugin>
-      <plugin>
-        <groupId>org.apache.maven.plugins</groupId>
         <artifactId>maven-jar-plugin</artifactId>
         <configuration>
           <archive>
@@ -121,8 +100,7 @@
   <dependencies>
     <dependency>
       <groupId>org.jboss.spec.javax.transaction</groupId>
-      <artifactId>jboss-transaction-api_1.1_spec</artifactId>
-      <version>1.0.0.Final</version>
+      <artifactId>jboss-transaction-api_1.2_spec</artifactId>
     </dependency>
     <dependency>
       <groupId>org.jboss.narayana.jta</groupId>
@@ -130,22 +108,20 @@
       <version>${version.narayana}</version>
     </dependency>
     <dependency>
-       <groupId>org.wildfly.core</groupId>
-       <artifactId>wildfly-logging</artifactId>
-       <version>${version.wildfly.logging}</version>
+      <groupId>org.jboss.logging</groupId>
+      <artifactId>jboss-logging</artifactId>
     </dependency>
     <dependency>
       <groupId>junit</groupId>
       <artifactId>junit</artifactId>
-      <version>${version.junit}</version>
       <scope>test</scope>
     </dependency>
   </dependencies>
   <modules>
     <module>javax_transaction</module>
-    <module>object_store/</module>
     <module>recovery</module>
-    <module>maven</module>
+    <module>transaction_manager</module>
     <module>jee_transactional_app</module>
+    <module>object_store</module>
   </modules>
 </project>

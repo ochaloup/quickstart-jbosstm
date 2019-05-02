@@ -101,7 +101,8 @@ As the scope of Narayana quickstart is broad - it shows integration with many pl
 
 _NOTE:_
 If you want to prepare the quickstarts by installing them without running any test
-then run the `mvn clean install -DskipTests`
+then run the `mvn clean install -DskipTests`.
+(Still the `JBOSS_HOME` variable has to be defined.)
 
 _NOTE:_
 If you want to run the quickstart with specific Narayana version you can use

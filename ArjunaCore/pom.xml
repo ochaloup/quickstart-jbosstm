@@ -22,25 +22,16 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jboss.narayana.quickstart.arjunacore</groupId>
-  <artifactId>narayana-quickstarts-core</artifactId>
-  <version>5.9.6.Final-SNAPSHOT</version>
+  <parent>
+    <groupId>org.jboss.narayana.quickstart</groupId>
+    <artifactId>narayana-quickstarts-parent</artifactId>
+    <version>5.9.6.Final-SNAPSHOT</version>
+  </parent>
+  <artifactId>arjuna-core-all</artifactId>
   <packaging>pom</packaging>
-  <name>JBoss Core Examples</name>
+  <name>Narayana Quickstarts: Arjuna Core Examples</name>
   <description>All quickstarts of JBoss Core</description>
-  <repositories>
-    <repository>
-      <id>jboss-public-repository-group</id>
-      <name>JBoss Public Maven Repository Group</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
+
   <build>
     <pluginManagement>
       <plugins>
