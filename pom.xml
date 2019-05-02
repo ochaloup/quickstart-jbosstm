@@ -140,6 +140,7 @@
     <version.jboss.transaction.api>2.0.0.Alpha1</version.jboss.transaction.api>
     <version.h2>1.4.199</version.h2>
     <version.narayana>5.9.6.Final-SNAPSHOT</version.narayana>
+    <version.surefire.plugin>2.19.1</version.surefire.plugin>
 
     <!-- versions used by dependency management in the parent pom.xml -->
     <version.byteman>4.0.6</version.byteman>
@@ -242,5 +243,6 @@
     <module>jts-docker</module>
     <module>karaf/osgi-jta</module>
     <module>jta-and-hibernate-standalone</module>
+    <module>agroal</module>
   </modules>
 </project>

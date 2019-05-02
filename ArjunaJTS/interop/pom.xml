@@ -17,39 +17,20 @@
 -->
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
   <modelVersion>4.0.0</modelVersion>
-  <groupId>org.jboss.narayana.quickstart.jts</groupId>
-  <artifactId>jts-interop-quickstart</artifactId>
-  <version>5.9.6.Final-SNAPSHOT</version>
-  <name>JTS Interoperability Quickstart Parent pom</name>
-  <description>Transactional EJB calls between GlassFish and WildFly</description>
+  <parent>
+    <groupId>org.jboss.narayana.quickstart</groupId>
+    <artifactId>jts-all</artifactId>
+    <version>5.9.6.Final-SNAPSHOT</version>
+    <relativePath>../pom.xml</relativePath>
+  </parent>
+  <artifactId>jts-interop</artifactId>
   <packaging>pom</packaging>
+  <name>Narayana Quickstarts: JTS Interoperability Quickstart Parent pom</name>
+  <description>Transactional EJB calls between GlassFish and WildFly</description>
 
   <properties>
-    <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
     <maven.build.timestamp.format>yyyyMMdd'T'HHmmss</maven.build.timestamp.format>
   </properties>
-
-  <licenses>
-    <license> 
-      <name>Apache License, Version 2.0</name>
-      <distribution>repo</distribution>
-      <url>http://www.apache.org/licenses/LICENSE-2.0.html</url>
-    </license> 
-  </licenses> 
-
-  <repositories>
-    <repository>
-      <id>jboss-public-repository-group</id>
-      <name>JBoss Public Maven Repository Group</name>
-      <url>https://repository.jboss.org/nexus/content/groups/public/</url>
-      <releases>
-        <enabled>true</enabled>
-      </releases>
-      <snapshots>
-        <enabled>true</enabled>
-      </snapshots>
-    </repository>
-  </repositories>
 
   <modules>
     <module>resource</module>
