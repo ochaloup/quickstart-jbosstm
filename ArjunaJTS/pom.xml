@@ -137,5 +137,7 @@
     <module>trailmap</module>
     <module>recovery</module>
     <module>standalone</module>
+    <!-- JBTM-3143 -->
+    <!-- <module>jts</module> -->
   </modules>
 </project>

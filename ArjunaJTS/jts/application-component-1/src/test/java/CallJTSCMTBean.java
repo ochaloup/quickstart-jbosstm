@@ -16,7 +16,7 @@
  * MA  02110-1301, USA.
  */
 import java.rmi.RemoteException;
-import java.util.Hashtable;
+import java.util.Properties;
 
 import javax.naming.Context;
 import javax.naming.InitialContext;
@@ -30,9 +30,8 @@ public class CallJTSCMTBean {
 
 	@Test
 	public void test() throws NamingException, RemoteException {
-		final Hashtable jndiProperties = new Hashtable();
-		jndiProperties.put(Context.URL_PKG_PREFIXES,
-				"org.jboss.ejb.client.naming");
+		final Properties jndiProperties = new Properties();
+		jndiProperties.put(Context.URL_PKG_PREFIXES, "org.jboss.ejb.client.naming");
 		jndiProperties.put("java.naming.factory.initial", "org.jboss.as.naming.InitialContextFactory");
 		final Context context = new InitialContext(jndiProperties);
 		final String appName = "";
