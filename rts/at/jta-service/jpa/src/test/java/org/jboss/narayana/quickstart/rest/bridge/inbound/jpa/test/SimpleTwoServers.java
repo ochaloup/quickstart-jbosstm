@@ -13,10 +13,17 @@ import org.jboss.narayana.quickstart.rest.bridge.inbound.jpa.jaxrs.TaskResource;
 /**
  *
  * @author rmartinc
+ *
+ * <ul>
+ *     <li>cp $JBOSS_HOME/docs/examples/configs/standalone-rts.xml $JBOSS_HOME/standalone/configuration/</li>
+ *     <li>cp $JBOSS_HOME_2/docs/examples/configs/standalone-rts.xml $JBOSS_HOME_2/standalone/configuration/</li>
+ *     <li>$JBOSS_HOME/bin/standalone.sh -c standalone-rts.xml -Djboss.tx.node.id=server1 -Djboss.node.name=server1</li>
+ *     <li>$JBOSS_HOME_2/bin/standalone.sh -c standalone-rts.xml -Djboss.tx.node.id=server2 -Djboss.node.name=server2 -Djboss.socket.binding.port-offset=10000</li>
+ * </ul>
  */
 public class SimpleTwoServers {
 
-    private static final String DEPLOYMENT_NAME = "restat-bridge-jpa-5.10.4.Final";
+    private static final String DEPLOYMENT_NAME = "restat-bridge-jpa-5.10.5.Final-SNAPSHOT";
 
     private static final String BASE_URL1 = "http://localhost:8080/";
     private static final String BASE_URL2 = "http://localhost:18080/";
