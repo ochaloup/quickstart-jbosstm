@@ -97,6 +97,10 @@
             <artifactId>jackson-databind</artifactId>
             <version>${version.jackson}</version>
         </dependency>
+        <dependency>
+            <groupId>javax.enterprise</groupId>
+            <artifactId>cdi-api</artifactId>
+        </dependency>
     </dependencies>
 </project>
   
